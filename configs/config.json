@@ -1,0 +1,26 @@
+{
+    "db_host": "localhost",
+    "db_port": 5432,
+    "db_user": "postgres",
+    "db_database": "velo-marshal",
+
+    "max_image_size_px": 512,
+
+    "port": 9000,
+    "debug": true,
+    "save_images_to_db": false,
+    "save_images_folder": "./images",
+
+    "cors-origins": [
+        "http://127.0.0.1",
+        "https://127.0.0.1"
+    ],
+
+    "SMTP_mail_server_host": "smtp.googlemail.com",
+    "SMTP_mail_server_port": 587,
+    "SMTP_mail_server_use_tls": true,
+    "mail_address": "velo.marshal@gmail.com",
+    "mail_sender_name": "VeloMarshal",
+
+    "geolite_db_path": "configs/GeoLite2-City.mmdb"
+}
