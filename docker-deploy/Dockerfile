@@ -9,4 +9,4 @@ RUN apt-get update -y && apt-get install --no-install-recommends -y  \
     pip install --upgrade pip setuptools wheel && \
     pip install --no-cache-dir --upgrade -r requirements.txt
 
-ENTRYPOINT ["gunicorn", "main:app", "-b", ":9000"]
+ENTRYPOINT ["gunicorn", "src.main:app", "-b", ":9000"]
