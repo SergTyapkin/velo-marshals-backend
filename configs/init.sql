@@ -16,10 +16,10 @@ CREATE TABLE IF NOT EXISTS users (
     canAssignAchievements   BOOLEAN DEFAULT FALSE,
     canEditRegistrations    BOOLEAN DEFAULT FALSE,
     canEditEvents           BOOLEAN DEFAULT FALSE,
-    canEditUsersLevels      BOOLEAN DEFAULT FALSE,
     canEditUsersData        BOOLEAN DEFAULT FALSE,
     canEditDocs             BOOLEAN DEFAULT FALSE,
-    canExecuteSQL           BOOLEAN DEFAULT FALSE
+    canExecuteSQL           BOOLEAN DEFAULT FALSE,
+    canEditHistory          BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
@@ -34,24 +34,25 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 ------ Events data -------
 CREATE TABLE IF NOT EXISTS events (
-    id              SERIAL PRIMARY KEY,
-    title           TEXT NOT NULL DEFAULT '',
-    description     TEXT NOT NULL DEFAULT '',
-    createdDate     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    startDate       TIMESTAMP WITH TIME ZONE NOT NULL,
-    cameDate        TIMESTAMP WITH TIME ZONE NOT NULL,
-    previewUrl      TEXT DEFAULT NULL,
-    customCSS       TEXT DEFAULT NULL,
-    lapDistanceKm   FLOAT NOT NULL,
-    medalPreviewUrl TEXT DEFAULT NULL,
-    authorId        INT REFERENCES users(id) ON DELETE SET NULL
+    id               SERIAL PRIMARY KEY,
+    title            TEXT NOT NULL DEFAULT '',
+    description      TEXT NOT NULL DEFAULT '',
+    routeDescription TEXT NOT NULL DEFAULT '',
+    createdDate      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    startDate        TIMESTAMP WITH TIME ZONE NOT NULL,
+    cameDate         TIMESTAMP WITH TIME ZONE NOT NULL,
+    previewUrl       TEXT DEFAULT NULL,
+    customCSS        TEXT DEFAULT NULL,
+    lapDistanceKm    FLOAT NOT NULL,
+    medalPreviewUrl  TEXT DEFAULT NULL,
+    authorId         INT REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS registrations (
     id           SERIAL PRIMARY KEY,
     userId       INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     eventId      INT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-    isConfirmed  BOOLEAN NOT NULL DEFAULT FALSE,
+    isConfirmed  BOOLEAN DEFAULT NULL,
     userComment  TEXT DEFAULT NULL,
     adminComment TEXT DEFAULT NULL,
     level        INT NOT NULL,
@@ -78,21 +79,10 @@ CREATE TABLE IF NOT EXISTS usersEquipments (
     id             SERIAL PRIMARY KEY,
     userId         INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     equipmentId    INT NOT NULL REFERENCES equipment(id) ON DELETE CASCADE,
-    eventId        INT NOT NULL REFERENCES event(id) ON DELETE CASCADE,
     amountHolds    INT NOT NULL,
     takenDate      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updatedDate    TIMESTAMP WITH TIME ZONE DEFAULT NULL,
-    UNIQUE (userId, eventId, equipmentId)
-);
-
-CREATE TABLE IF NOT EXISTS equipmentsHistory (
-    id             SERIAL PRIMARY KEY,
-    equipmentId    INT NOT NULL REFERENCES equipment(id) ON DELETE CASCADE,
-    userFromId     INT REFERENCES users(id) ON DELETE CASCADE,
-    userToId       INT REFERENCES users(id) ON DELETE CASCADE,
-    eventId        INT NOT NULL REFERENCES event(id) ON DELETE CASCADE,
-    amount         INT NOT NULL,
-    date           TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+    UNIQUE (userId, equipmentId)
 );
 
 ------- Achievements data -------
@@ -133,4 +123,13 @@ CREATE TABLE IF NOT EXISTS images (
     author         INT REFERENCES users(id) ON DELETE SET NULL,
     type           TEXT NOT NULL,
     bytes          BYTEA
+);
+
+------ Total history ------
+CREATE TABLE IF NOT EXISTS history (
+    id             SERIAL PRIMARY KEY,
+    userId         INT REFERENCES users(id) ON DELETE SET NULL,
+    type           TEXT NOT NULL,
+    text           TEXT NOT NULL,
+    date           TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );

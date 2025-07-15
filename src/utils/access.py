@@ -86,12 +86,6 @@ def login_and_can_edit_events_required(f):
         (userData, res) = __login_and_property_required('caneditevents', "Нет прав на изменение событий")
         return res or f(*args, userData, **kwargs)
     return wrapper
-def login_and_can_edit_users_levels_required(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        (userData, res) = __login_and_property_required('canedituserslevels', "Нет прав на изменение уровней пользователей")
-        return res or f(*args, userData, **kwargs)
-    return wrapper
 def login_and_can_edit_registrations_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -108,6 +102,12 @@ def login_and_can_execute_sql_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         (userData, res) = __login_and_property_required('canexecutesql', "Нет прав на выполнение произвольных SQL-запросов")
+        return res or f(*args, userData, **kwargs)
+    return wrapper
+def login_and_can_edit_history_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        (userData, res) = __login_and_property_required('canedithistory', "Нет прав на изменение и просмотр истории")
         return res or f(*args, userData, **kwargs)
     return wrapper
 

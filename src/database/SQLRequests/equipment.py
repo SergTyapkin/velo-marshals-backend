@@ -6,34 +6,27 @@ insertEquipment = \
     "RETURNING *"
 
 insertUserEquipment = \
-    "INSERT INTO usersequipments (userId, equipmentId, eventId, amountHolds) " \
-    "VALUES (%s, %s, %s, %s) " \
-    "RETURNING *"
-
-insertEquipmentsHistory = \
-    "INSERT INTO equipmentshistory (eventId, equipmentId, userFromId, userToId, amount) " \
-    "VALUES (%s, %s, %s, %s) " \
+    "INSERT INTO usersequipments (userId, equipmentId, amountHolds) " \
+    "VALUES (%s, %s, %s) " \
     "RETURNING *"
 
 
 # ----- SELECTS -----
+selectEquipmentById = \
+    "SELECT * FROM equipments " \
+    "WHERE id = %s"
+
 selectEquipmentsByEventId = \
     "SELECT equipments.*, amountTotal - SUM(usersEquipments.amountHolds) as amountLeft FROM equipments " \
     "JOIN usersEquipments ue ON ue.equipmentId = equipments.id" \
-    "WHERE usersEquipments.eventId = %s"
+    "WHERE usersEquipments.eventId = %s "
+    # "GROUP BY equipments.title"
 
 selectEquipmentUsersHoldersByEquipmentIdEventId = \
     "SELECT users.id, (users.givenName  || ' ' || users.familyName) as username, users.avatarUrl FROM usersEquipments " \
     "JOIN users ON usersEquipments.userId = users.id " \
     "WHERE usersEquipments.equipmentId = %s" \
     "AND eventId = %s"
-
-# %s for title search must be provided as: '%{}%'.format(<YOUR_VAR>)
-selectEquipmentBySearchTitleEventId = \
-    f"SELECT * FROM equipments " \
-    f"WHERE LOWER(title) LIKE %s " \
-    f"AND eventId = %s" \
-    f"ORDER BY title"
 
 selectUserEquipmentsByUseridEventId = \
     "SELECT usersequipments.*, equipments.title, equipment.previewUrl  FROM usersequipments " \
@@ -42,16 +35,6 @@ selectUserEquipmentsByUseridEventId = \
     "AND eventId = %s" \
     "ORDER BY takenDate"
 
-selectEquipmentsHistoryByEventId = \
-    "SELECT equipmentshistory.*, equipments.title, equipment.previewUrl, (uf.givenName  || ' ' || uf.familyName) as fromusername, uf.avatarUrl as fromuseravatarurl, (ut.givenName  || ' ' || ut.familyName) as tousername, ut.avatarUrl as touseravatarurl FROM equipmentshistory " \
-    "JOIN equipments on equipmentshistory.equipmentid = equipments.id " \
-    "JOIN users uf on equipmentshistory.userfromid = uf.id " \
-    "JOIN users ut on equipmentshistory.usertoid = ut.id " \
-    "WHERE eventid = %s " \
-    "ORDER BY date"
-
-
-# ----- UPDATES -----
 
 updateEquipmentById = \
     "UPDATE equipments " \

@@ -43,6 +43,12 @@ def docCreate(userData):
 
     doc = DB.execute(SQLDocs.insertDoc, [title, text, userData['id'], userData['id']])
 
+    insertHistory(
+        userData["id"],
+        'docs',
+        f'Creates document: "{doc["title"]}" #{doc["id"]}'
+    )
+
     return jsonResponse(doc)
 
 
@@ -66,6 +72,12 @@ def docUpdate(userData):
 
     doc = DB.execute(SQLDocs.updateDocById, [title, text, userData['id'], id])
 
+    insertHistory(
+        userData["id"],
+        'docs',
+        f'Updates document: "{doc["title"]}" #{doc["id"]}'
+    )
+
     return jsonResponse(doc)
 
 
@@ -79,4 +91,11 @@ def docDelete(userData):
         return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
 
     DB.execute(SQLDocs.deleteDocById, [id])
+
+    insertHistory(
+        userData["id"],
+        'docs',
+        f'Deletes document: #{id}'
+    )
+
     return jsonResponse("Документ удален")

@@ -5,11 +5,7 @@ from flask_mail import Mail
 from src.blueprints.user import app as user_app
 from src.blueprints.admin import app as admin_app
 from src.blueprints.event import app as event_app
-from src.blueprints.ratings import app as ratings_app
 from src.blueprints.registration import app as participation_app
-from src.blueprints.place import app as place_app
-from src.blueprints.period import app as period_app
-from src.blueprints.position import app as position_app
 from src.blueprints.docs import app as docs_app
 from src.blueprints.image import app as image_app
 from src.blueprints.achievements import app as achievements_app
@@ -24,11 +20,7 @@ app.wsgi_app = Middleware(app.wsgi_app, url_prefix='/api', cors_origins=_config[
 app.register_blueprint(user_app,   url_prefix='/user')
 app.register_blueprint(admin_app,  url_prefix='/admin')
 app.register_blueprint(event_app,  url_prefix='/event')
-app.register_blueprint(ratings_app, url_prefix='/ratings')
 app.register_blueprint(participation_app,   url_prefix='/participation')
-app.register_blueprint(place_app,   url_prefix='/place')
-app.register_blueprint(period_app,   url_prefix='/period')
-app.register_blueprint(position_app,   url_prefix='/position')
 app.register_blueprint(docs_app,   url_prefix='/docs')
 app.register_blueprint(image_app,   url_prefix='/image')
 app.register_blueprint(achievements_app,   url_prefix='/achievements')
@@ -45,7 +37,7 @@ mail = Mail(app)
 
 @app.route('/')
 def home():
-    return "Это начальная страница API для сайта техподдержки, а не сайт. Вiйди отсюда!"
+    return "Это начальная страница API для сайта веломаршалов, а не сам сайт. Вiйди отсюда!"
 
 
 @app.errorhandler(404)

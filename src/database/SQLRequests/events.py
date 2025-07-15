@@ -1,5 +1,5 @@
 insertEvent = \
-    "INSERT INTO events (title, description, previewUrl, customCSS, lapDistanceKm, medalPreviewUrl, authorId, startDate, cameDate) " \
+    "INSERT INTO events (title, description, routeDescription, previewUrl, customCSS, lapDistanceKm, medalPreviewUrl, authorId, startDate, cameDate) " \
     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) " \
     "RETURNING *"
 
@@ -57,9 +57,12 @@ selectRegistrationByUseridEventid = \
 selectRegistrationsByEventid = \
     "SELECT registrations.*, (users.givenName  || ' ' || users.familyName) as username, users.avatarUrl useravatarurl, users.tel usertel, users.tgUsername usertgusername FROM registrations " \
     "JOIN users ON registrations.userid = users.id " \
-    "JOIN events on registrations.eventid = events.id " \
-    "WHERE eventid = %s " \
-    "ORDER BY events.cameDate"
+    "WHERE eventid = %s "
+
+selectRegistrationsUnconfirmedByEventid = \
+    "SELECT registrations.*, (users.givenName  || ' ' || users.familyName) as username, users.avatarUrl useravatarurl, users.tel usertel, users.tgUsername usertgusername FROM registrations " \
+    "JOIN users ON registrations.userid = users.id " \
+    "WHERE eventid = %s "
 
 selectRegistrationsByUserId = \
     "SELECT registrations.*, (users.givenName  || ' ' || users.familyName) as username, users.avatarUrl useravatarurl, users.tel usertel, users.tgUsername usertgusername, events.medalPreviewUrl as eventmedalpreviewurl, events.id as eventid, events.title as eventtitle FROM registrations " \
@@ -89,6 +92,7 @@ updateEventById = \
     "UPDATE events SET " \
     "title = %s, " \
     "description = %s, " \
+    "routeDescription = %s, " \
     "startDate = %s, " \
     "cameDate = %s, " \
     "previewUrl = %s, " \
@@ -116,9 +120,9 @@ updateRegistrationLeaveDateById = \
     "WHERE id = %s " \
     "RETURNING *"
 
-updateRegistrationLapsPassedById = \
+updateIncreaseRegistrationLapsPassedById = \
     "UPDATE registrations SET " \
-    "lapsPassed = %s, " \
+    "lapsPassed = lapsPassed + 1, " \
     "WHERE id = %s " \
     "RETURNING *"
 
@@ -129,6 +133,9 @@ updateRegistrationById = \
     "level = %s, " \
     "salary = %s, " \
     "taskText = %s, " \
+    "lapsPassed = %s, " \
+    "cameDate = %s, " \
+    "leaveDate = %s, " \
     "WHERE id = %s " \
     "RETURNING *"
 

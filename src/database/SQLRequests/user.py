@@ -1,7 +1,7 @@
 # -----------------------
 # -- Default user part --
 # -----------------------
-_userColumns = "users.id, users.tgUsername, users.tgId, users.email, users.tel, users.avatarUrl, users.givenName, users.familyName, users.middleName, users.joinedDate, users.level, users.canEditAchievements, users.canAssignAchievements, users.canEditRegistrations, users.canEditEvents, users.canEditUsersLevels, users.canEditUsersData, users.canEditDocs, users.canExecuteSQL"
+_userColumns = "users.id, users.tgUsername, users.tgId, users.email, users.tel, users.avatarUrl, users.givenName, users.familyName, users.middleName, users.joinedDate, users.level, users.canEditAchievements, users.canAssignAchievements, users.canEditRegistrations, users.canEditEvents, users.canEditUsersData, users.canEditDocs, users.canExecuteSQL, users.canEditHistory"
 
 # ----- INSERTS -----
 insertUser = \

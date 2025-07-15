@@ -8,6 +8,9 @@ from flask_mail import Mail, Message
 
 from src.constants import HTTP_OK
 
+from src.connections import DB
+from src.database.SQLRequests import history as SQLHistory
+
 
 def str_between(string: (str, bytes), start: (str, bytes), end: (str, bytes), replace_to: (str, bytes) = None):
     end_idx = start_idx = string.find(start) + len(start)
@@ -125,3 +128,7 @@ def times_to_str(object):
 def list_times_to_str(listWithTimedelta):
     for el in listWithTimedelta:
         times_to_str(el)
+
+
+def insertHistory(userId, type, text):
+    DB.execute(SQLHistory.insertHistory, [userId, type, text])
