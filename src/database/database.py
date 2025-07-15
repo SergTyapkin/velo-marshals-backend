@@ -27,7 +27,10 @@ class Database:
         except psycopg2.OperationalError as err:
             print('\n/*/', err)
 
-            if err.args[0] == 2003:
+            if not len(err.args):
+                print('Неизвестная ошибка при подключении к БД')
+                exit()
+            elif err.args[0] == 2003:
                 print('Неверный формат host')
                 exit()
             elif err.args[0] == 1045:
@@ -54,12 +57,10 @@ class Database:
                         print('\n/*/', "Ошибка при создании базы данных:")
                         print('\n/*/', error)
                     exit()
-                    return
                 finally:
                     self.cursor.close()
             print('Неизвестная ошибка при подключении к БД')
             exit()
-            return
 
         try:
             with open('./configs/init.sql') as initFile:

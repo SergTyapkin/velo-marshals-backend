@@ -1,17 +1,21 @@
 import hashlib
+import hmac
 from functools import wraps
 
 from flask import request
 
-import src.database.SQL_requests as sql
+import src.database.SQLRequests.user as SQLUser
 from src.connections import DB
 from src.constants import *
 from src.utils.utils import *
 
 
-def hash_sha256(auth_string: str) -> str:
-    hash = hashlib.sha256(auth_string.encode()).hexdigest()
-    return hash
+def sha256(string: str) -> str:
+    hash = hashlib.sha256(string.encode())
+    return hash.hexdigest()
+def hmac_sha256(key: str, string: str) -> str:
+    h = hmac.new(key.encode("UTF-8"), string.encode(), hashlib.sha256)
+    return h.hexdigest()
 
 
 def compare_user_session_ip(dbSession):
@@ -25,7 +29,7 @@ def get_logined_userid() -> dict | None:
     token = request.cookies.get('session_token')
     if not token:
         return None
-    result = DB.execute(sql.selectUserIdBySessionToken, [token])
+    result = DB.execute(SQLUser.selectUserIdBySessionToken, [token])
     if len(result) == 0:
         return None
     result['session_token'] = token
@@ -36,7 +40,7 @@ def get_logined_user() -> dict | None:
     token = request.cookies.get('session_token')
     if not token:
         return None
-    result = DB.execute(sql.selectUserDataBySessionToken, [token])
+    result = DB.execute(SQLUser.selectUserDataBySessionToken, [token])
     if len(result) == 0:
         return None
     result['session_token'] = token

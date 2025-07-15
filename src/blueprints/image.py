@@ -8,6 +8,7 @@ from flask import Blueprint, Response
 from src.connections import config
 from src.utils.access import *
 from src.utils.utils import *
+from src.database.databaseUtils import insertHistory
 
 from src.database.SQLRequests import images as SQLImages
 

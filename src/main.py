@@ -3,7 +3,7 @@ from flask import Flask
 from flask_mail import Mail
 
 from src.blueprints.user import app as user_app
-from src.blueprints.admin import app as admin_app
+from src.blueprints.sql import app as sql_app
 from src.blueprints.event import app as event_app
 from src.blueprints.registration import app as participation_app
 from src.blueprints.docs import app as docs_app
@@ -18,7 +18,7 @@ app = Flask(__name__)
 app.wsgi_app = Middleware(app.wsgi_app, url_prefix='/api', cors_origins=_config['cors-origins'])
 
 app.register_blueprint(user_app,   url_prefix='/user')
-app.register_blueprint(admin_app,  url_prefix='/admin')
+app.register_blueprint(sql_app,  url_prefix='/sql')
 app.register_blueprint(event_app,  url_prefix='/event')
 app.register_blueprint(participation_app,   url_prefix='/participation')
 app.register_blueprint(docs_app,   url_prefix='/docs')

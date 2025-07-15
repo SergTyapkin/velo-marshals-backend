@@ -1,38 +1,39 @@
 # -----------------------
 # -- Default user part --
 # -----------------------
-_userColumns = "users.id, users.tgUsername, users.tgId, users.email, users.tel, users.avatarUrl, users.givenName, users.familyName, users.middleName, users.joinedDate, users.level, users.canEditAchievements, users.canAssignAchievements, users.canEditRegistrations, users.canEditEvents, users.canEditUsersData, users.canEditDocs, users.canExecuteSQL, users.canEditHistory"
+_userPublicColumns = "users.id, users.tgUsername, users.tgId, users.tel, users.avatarUrl, users.givenName, users.familyName, users.middleName, users.joinedDate, users.level"
 
 # ----- INSERTS -----
 insertUser = \
-    "INSERT INTO users (password, avatarUrl, email, firstName, secondName, thirdName, telegram) " \
-    "VALUES (%s, NULL, %s, %s, %s, %s, %s) " \
-    f"RETURNING {_userColumns}"
+    "INSERT INTO users (tgId, tgUsername, avatarUrl, email, tel, familyName, givenName, middleName) " \
+    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) " \
+    f"RETURNING *"
 
 insertSession = \
     "INSERT INTO sessions (userId, token, expires, ip, browser, os, geolocation) " \
     "VALUES (%s, %s, NOW() + interval '1 week' * %s, %s, %s, %s, %s) " \
     "RETURNING *"
 
+insertSecretCode = \
+    "INSERT INTO secretCodes (userId, code, type, expires) " \
+    "VALUES (%s, %s, %s, NOW() + interval '7 days' * %s)" \
+    "RETURNING *"
+
 # ----- SELECTS -----
-selectUserByEmailPassword = \
-    f"SELECT {_userColumns} FROM users " \
-    "WHERE email = %s AND password = %s"
+selectUserByTgId = \
+    f"SELECT id FROM users " \
+    "WHERE tgId = %s"
 
 selectUserById = \
-    f"SELECT {_userColumns} FROM users " \
+    f"SELECT * FROM users " \
     "WHERE id = %s"
 
 selectAnotherUserById = \
-    f"SELECT id, firstName, secondName, thirdName, joinedDate, avatarUrl, telegram, title FROM users " \
-    "WHERE id = %s"
-
-selectAnotherUserByIdWithEmail = \
-    f"SELECT id, firstName, secondName, thirdName, joinedDate, avatarUrl, telegram, title, email, isConfirmedEmail FROM users " \
+    f"SELECT {_userPublicColumns} FROM users " \
     "WHERE id = %s"
 
 selectUserByEmail = \
-    f"SELECT {_userColumns} FROM users " \
+    f"SELECT {_userPublicColumns} FROM users " \
     "WHERE email = %s"
 
 selectUserIdBySessionToken = \
@@ -48,27 +49,23 @@ selectAllUserSessions = \
     "WHERE userId = %s"
 
 selectUserDataBySessionToken = \
-    f"SELECT {_userColumns}, ip FROM sessions " \
+    f"SELECT users.*, ip FROM sessions " \
     "JOIN users ON sessions.userId = users.id " \
     "WHERE token = %s"
 
 def selectUsersByFilters(filters):
     return \
-            f"SELECT {_userColumns} FROM users " \
+            f"SELECT {_userPublicColumns} FROM users " \
             "WHERE " + \
-            (f"isconfirmedByAdmin = {filters['confirmedByAdmin']} AND " if 'confirmedByAdmin' in filters else "") + \
-            (f"isconfirmedEmail = {filters['confirmedEmail']} AND " if 'confirmedEmail' in filters else "") + \
-            (
-                f"LOWER(firstName  || ' ' || secondName) LIKE '%%{filters['search'].lower()}%%' AND " if 'search' in filters else "") + \
+            (f"LOWER(familyName || ' ' || givenName ' ' || middleName) LIKE '%%{filters['search'].lower()}%%' AND " if 'search' in filters else "") + \
             "1 = 1 " \
-            "ORDER BY firstName, secondName"
+            "ORDER BY familyName, givenName"
 
-
-selectRegistrationsExtractByUserIdDatestartDateend = \
-    "SELECT events.*, events.date FROM registrations " \
-    "JOIN events ON registrations.eventid = events.id " \
-    "WHERE userid = %s " \
-    "AND events.date BETWEEN %s AND %s"
+selectSecretCodeByUserIdType = \
+    "SELECT * FROM secretCodes " \
+    "WHERE userId = %s AND " \
+    "type = %s AND " \
+    "expires > NOW()"
 
 # ----- UPDATES -----
 updateUserById = \
@@ -82,12 +79,36 @@ updateUserById = \
     "WHERE id = %s " \
     "RETURNING *"
 
-updateUserPasswordByIdPassword = \
+adminUpdateUserById = \
     "UPDATE users SET " \
-    "password = %s " \
-    "WHERE id = %s AND password = %s " \
-    "RETURNING id"
+    "givenName = %s, " \
+    "familyName = %s, " \
+    "middleName = %s, " \
+    "email = %s, " \
+    "tel = %s, " \
+    "avatarUrl = %s, " \
+    "level = %s, " \
+    "tgUsername = %s, " \
+    "tgId = %s, " \
+    "canEditAchievements = %s, " \
+    "canAssignAchievements = %s, " \
+    "canEditRegistrations = %s, " \
+    "canEditEvents = %s, " \
+    "canEditUsersData = %s, " \
+    "canEditDocs = %s, " \
+    "canExecuteSQL = %s, " \
+    "canEditHistory = %s " \
+    "WHERE id = %s " \
+    "RETURNING *"
 
+updateUserConfirmationBySecretcodeType = \
+    "UPDATE users " \
+    "SET isConfirmedEmail = True " \
+    "FROM secretCodes " \
+    "WHERE secretCodes.userId = users.id AND " \
+    "secretCodes.code = %s AND " \
+    "secretCodes.type = %s " \
+    "RETURNING users.*"
 
 # ----- DELETES -----
 deleteExpiredSessions = \
@@ -106,3 +127,12 @@ deleteAllUserSessionsWithoutCurrent = \
     "DELETE FROM sessions " \
     "WHERE userId = %s AND " \
     "token != %s"
+
+deleteExpiredSecretCodes = \
+    "DELETE FROM secretCodes " \
+    "WHERE expires <= NOW()"
+
+deleteSecretCodeByUseridCode = \
+    "DELETE FROM secretCodes " \
+    "WHERE userId = %s AND " \
+    "code = %s"

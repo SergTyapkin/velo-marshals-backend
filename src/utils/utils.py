@@ -8,9 +8,6 @@ from flask_mail import Mail, Message
 
 from src.constants import HTTP_OK
 
-from src.connections import DB
-from src.database.SQLRequests import history as SQLHistory
-
 
 def str_between(string: (str, bytes), start: (str, bytes), end: (str, bytes), replace_to: (str, bytes) = None):
     end_idx = start_idx = string.find(start) + len(start)
@@ -37,6 +34,9 @@ def read_config(filepath: str) -> dict:
         if "mail_password" not in config:
             config["mail_password"] = os.environ["MAIL_PASSWORD"]
 
+        if "tg_bot_token" not in config:
+            config["tg_bot_token"] = os.environ["TG_BOT_TOKEN"]
+
         return config
     except Exception as e:
         print("Can't open and serialize json:", filepath)
@@ -49,8 +49,8 @@ def read_app_config(filepath: str) -> dict:
 
     if config['save_images_to_db'] is False:
         if not os.path.isdir(config['save_images_folder']):
-            print("Folder to saving images doesn't exists:", config['save_images_folder'])
-            exit()
+            print("Folder to saving images doesn't exists. Creating", config['save_images_folder'], '...')
+            os.mkdir(config['save_images_folder'])
 
     return config
 
@@ -83,23 +83,6 @@ def html_prettify(headers: list, body: list, multilines: bool = False, row_oncli
 
     return "<table>\n" + thead + tbody + "</table>"
 
-    # flex
-    '''tbody = "<div class=\"grid-rows\">\n"
-    trow = "<div class=\"grid-columns\">\n"
-    for header in headers:
-        trow += "<div>" + header + "</div>\n"
-    trow += "</div>\n"
-    tbody += trow
-
-    for row in body:
-        trow = "<div class=\"grid-columns\"" + ((" onclick=" + row_onclick(row[0]) + " style=\"cursor: pointer\"") if row_onclick else "") + ">\n"
-        for value in row:
-            trow += "<div>" + value_foo(value) + "</div>"
-        trow += "</div>\n"
-        tbody += trow
-
-    return tbody + "</div>"'''
-
 
 def jsonResponse(resp: dict or str, code: int = HTTP_OK):
     if isinstance(resp, str):
@@ -128,7 +111,3 @@ def times_to_str(object):
 def list_times_to_str(listWithTimedelta):
     for el in listWithTimedelta:
         times_to_str(el)
-
-
-def insertHistory(userId, type, text):
-    DB.execute(SQLHistory.insertHistory, [userId, type, text])

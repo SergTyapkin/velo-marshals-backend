@@ -2,6 +2,7 @@ from flask import Blueprint
 
 from src.utils.access import *
 from src.utils.utils import *
+from src.database.databaseUtils import insertHistory
 
 from src.database.SQLRequests import docs as SQLDocs
 

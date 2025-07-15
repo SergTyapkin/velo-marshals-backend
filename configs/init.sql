@@ -3,11 +3,12 @@ CREATE TABLE IF NOT EXISTS users (
     id               SERIAL PRIMARY KEY,
     tgUsername       TEXT DEFAULT NULL UNIQUE,
     tgId             TEXT DEFAULT NULL UNIQUE,
-    email            TEXT DEFAULT NULL UNIQUE,
+    email            TEXT NOT NULL UNIQUE,
+    isConfirmedEmail BOOLEAN NOT NULL DEFAULT FALSE,
     tel              TEXT NOT NULL UNIQUE,
     avatarUrl        TEXT,
-    givenName        TEXT NOT NULL,
     familyName       TEXT NOT NULL,
+    givenName        TEXT NOT NULL,
     middleName       TEXT DEFAULT NULL,
     joinedDate       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     level            INTEGER NOT NULL DEFAULT 1,
@@ -30,6 +31,15 @@ CREATE TABLE IF NOT EXISTS sessions (
     browser     TEXT,
     os          TEXT,
     geolocation TEXT
+);
+
+CREATE TABLE IF NOT EXISTS secretCodes (
+    id             SERIAL PRIMARY KEY,
+    userId         INT REFERENCES users(id) ON DELETE CASCADE,
+    code           TEXT NOT NULL UNIQUE,
+    type           TEXT NOT NULL,
+    expires        TIMESTAMP WITH TIME ZONE NOT NULL,
+    UNIQUE (userId, type)
 );
 
 ------ Events data -------
@@ -72,7 +82,7 @@ CREATE TABLE IF NOT EXISTS equipment (
     previewUrl      TEXT DEFAULT NULL,
     amountTotal     INT NOT NULL,
     isNeedsToReturn BOOLEAN NOT NULL,
-    eventId         INT NOT NULL REFERENCES event(id) ON DELETE CASCADE
+    eventId         INT NOT NULL REFERENCES events(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS usersEquipments (

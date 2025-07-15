@@ -3,13 +3,14 @@ from flask import Blueprint
 from src.utils.access import *
 from src.constants import *
 from src.utils.utils import *
+from src.database.databaseUtils import insertHistory
 
-from src.database.SQLRequests import events as SQLEvents
+from src.database.SQLRequests import history as SQLHistory
 
-app = Blueprint('admin', __name__)
+app = Blueprint('sql', __name__)
 
 
-@app.route("/sql", methods=["POST"])
+@app.route("", methods=["POST"])
 @login_and_can_execute_sql_required
 def executeSQL(userData):
     try:
@@ -21,6 +22,21 @@ def executeSQL(userData):
     try:
         resp = DB.execute(sqlText, manyResults=True)
         list_times_to_str(resp)
+
+        insertHistory(
+            userData['id'],
+            'sql',
+            sqlText,
+        )
+
         return jsonResponse({"response": resp})
     except Exception as err:
         return jsonResponse(str(err), HTTP_INTERNAL_ERROR)
+
+@app.route("/history")
+@login_and_can_execute_sql_required
+def getSQLHistory(userData):
+    resp = DB.execute(SQLHistory.selectHistory({"type": "sql"}), manyResults=True)
+    list_times_to_str(resp)
+
+    return jsonResponse({"history": resp})
