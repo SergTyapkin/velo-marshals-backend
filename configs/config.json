@@ -11,6 +11,7 @@
     "tg_bot_token": "set_in_env",
 
     "max_image_size_px": 512,
+    "allow_auth_period_min": 30,
 
     "port": 9000,
     "debug": true,
