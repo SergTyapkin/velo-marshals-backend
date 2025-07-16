@@ -28,8 +28,8 @@ def check_tg_auth_hash(id, first_name, last_name, username, photo_url, auth_date
         f"\nphoto_url={photo_url}" if photo_url else "" + \
         f"\nusername={username}" if username else ""
 
-    secret_key = sha256(config["tg_bot_token"])
-    expected_hash = hmac_sha256(secret_key, data_check_string)
+    secret_key = hashlib.sha256(config["tg_bot_token"].encode('utf-8')).digest()
+    expected_hash = hmac.new(secret_key, bytes(data_check_string, 'utf-8'), hashlib.sha256).hexdigest()
     print("data_check_string", data_check_string)
     print("secret_key sha256", secret_key)
     print("hash", hash)
@@ -84,6 +84,7 @@ def userAuth():
     except:
         return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
 
+    print("POST /auth", json.dumps(req))
     if not check_tg_auth_hash(tgId, tgFirstName, tgLastName, tgUsername, tgPhotoUrl, tgAuthDate, tgHash):
         return jsonResponse("Хэш авторизации TG не совпадает с данными", HTTP_INVALID_AUTH_DATA)
 
