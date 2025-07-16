@@ -5,6 +5,10 @@
     "db_port": 5432,
     "db_user": "postgres",
     "db_name": "marshals",
+    "db_password": "set_in_env",
+
+    "mail_password": "set_in_env",
+    "tg_bot_token": "set_in_env",
 
     "max_image_size_px": 512,
 
