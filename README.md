@@ -1,4 +1,4 @@
-![GithubCI](https://github.com/SergTyapkin/velo-marshals-backend/actions/workflows/deploy.yml/badge.svg)
+![GithubCI](https://github.com/SergTyapkin/velo-marshals-backend/actions/workflows/deployMain.yml/badge.svg)
 
 # ARK Backend
 
