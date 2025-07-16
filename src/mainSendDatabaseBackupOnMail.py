@@ -2,13 +2,11 @@ import os
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 
-from src.utils.utils import read_app_config
-
 import smtplib
 from email.mime.text import MIMEText
 from datetime import datetime
 
-config = read_app_config('./configs/config.json')
+from src.connections import config
 
 DB_NAME = "tech-support"
 MAIL_RECIPIENT = config["mail_address"]

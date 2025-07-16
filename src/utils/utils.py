@@ -28,6 +28,7 @@ def read_config(filepath: str) -> dict:
         config = json.load(file)
         file.close()
 
+        config["debug"] = str(os.environ.get("DEBUG", config["debug"])).lower() == 'true'
         config["db_user"] = os.environ.get("DB_USER", config["db_user"])
         config["db_host"] = os.environ.get("DB_HOST", config["db_host"])
         config["db_port"] = os.environ.get("DB_PORT", config["db_port"])
@@ -36,6 +37,11 @@ def read_config(filepath: str) -> dict:
         config["mail_password"] = os.environ.get("MAIL_PASSWORD", config["mail_password"])
         config["tg_bot_token"] = os.environ.get("TG_BOT_TOKEN", config["tg_bot_token"])
 
+        if config['save_images_to_db'] is False:
+            if not os.path.isdir(config['save_images_folder']):
+                print("Folder to saving images doesn't exists. Creating", config['save_images_folder'], '...')
+                os.mkdir(config['save_images_folder'])
+
         print("Config loaded:\n", json.dumps(config, indent=4))
 
         return config
@@ -43,17 +49,6 @@ def read_config(filepath: str) -> dict:
         print("Can't open and serialize json:", filepath)
         print(e)
         exit()
-
-
-def read_app_config(filepath: str) -> dict:
-    config = read_config(filepath)
-
-    if config['save_images_to_db'] is False:
-        if not os.path.isdir(config['save_images_folder']):
-            print("Folder to saving images doesn't exists. Creating", config['save_images_folder'], '...')
-            os.mkdir(config['save_images_folder'])
-
-    return config
 
 
 def count_lines(filename, chunk_size=4096) -> int:

@@ -2,10 +2,9 @@ import geoip2.errors
 from flask import request
 from geoip2 import database
 
-from src.utils.utils import read_app_config
+from src.connections import config
 
-_config = read_app_config('./configs/config.json')
-_reader = database.Reader(_config['geolite_db_path'])
+_reader = database.Reader(config['geolite_db_path'])
 
 
 def detectGeoLocation():
