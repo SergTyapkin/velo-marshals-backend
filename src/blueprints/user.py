@@ -36,7 +36,7 @@ def check_tg_auth_hash(id, first_name, last_name, username, photo_url, auth_date
     print("expected_hash", expected_hash)
 
     insertHistory(
-        id,
+        None,
         'hash_check',
         f"data_check_string {data_check_string}, secret_key-sha256 {config['tg_bot_token'].encode('utf-8')}, hash {hash}, expected_hash {expected_hash}"
     )
