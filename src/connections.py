@@ -8,5 +8,5 @@ DB = Database(
     port=config['db_port'],
     user=config['db_user'],
     password=config['db_password'],
-    dbname=config['db_database'],
+    dbname=config['db_name'],
 )
