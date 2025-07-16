@@ -14,6 +14,7 @@ services:
       - VERSION
       - DEBUG
       - DB_ECHO_LOG
+      - TG_BOT_TOKEN
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_HOST=${DB_CONTAINER_NAME}
