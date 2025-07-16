@@ -14,11 +14,11 @@ services:
       - VERSION
       - DEBUG
       - DB_ECHO_LOG
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_HOST=${DB_CONTAINER_NAME}
-      - POSTGRES_PORT
-      - POSTGRES_DB
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=${DB_CONTAINER_NAME}
+      - DB_PORT=${POSTGRES_PORT}
+      - DB_NAME=${POSTGRES_DB}
       - MAIL_PASSWORD
     restart: unless-stopped
     volumes:

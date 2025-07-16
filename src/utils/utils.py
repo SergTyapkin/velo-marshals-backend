@@ -28,14 +28,13 @@ def read_config(filepath: str) -> dict:
         config = json.load(file)
         file.close()
 
-        if "db_password" not in config:
-            config["db_password"] = os.environ["DATABASE_PASSWORD"]
-
-        if "mail_password" not in config:
-            config["mail_password"] = os.environ["MAIL_PASSWORD"]
-
-        if "tg_bot_token" not in config:
-            config["tg_bot_token"] = os.environ["TG_BOT_TOKEN"]
+        config["db_user"] = os.environ.get("DB_USER", config["db_user"])
+        config["db_host"] = os.environ.get("DB_HOST", config["db_host"])
+        config["db_port"] = os.environ.get("DB_PORT", config["db_port"])
+        config["db_name"] = os.environ.get("DB_NAME", config["db_name"])
+        config["db_password"] = os.environ.get("DB_PASSWORD", config["db_password"])
+        config["mail_password"] = os.environ.get("MAIL_PASSWORD", config["mail_password"])
+        config["tg_bot_token"] = os.environ.get("TG_BOT_TOKEN", config["tg_bot_token"])
 
         return config
     except Exception as e:
