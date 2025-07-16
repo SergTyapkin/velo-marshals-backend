@@ -72,11 +72,6 @@ pip install -r requirements.txt
 ### База данных
 В файл `.env` прописать свои настройки Postgres
 
-### Alembic migrate
-```shell
-alembic upgrade head
-```
-
 ### Старт
 ```shell
 python main.py

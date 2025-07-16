@@ -4,7 +4,7 @@
 info:
 	echo "------------------------------------------------------------------------------------------------------" && \
 	echo "| You runs make command with no targets. You must specify target after 'make'. For example 'make all' |" && \
-	echo "| Available targets: all; update; build; run; down; migrate; setup-ci; install-docker-if-not-exists; set-docker-not-sudo; setup-env-file." && \
+	echo "| Available targets: all; update; build; run; down; setup-ci; install-docker-if-not-exists; set-docker-not-sudo; setup-env-file." && \
 	echo "------------------------------------------------------------------------------------------------------"
 
 build:
