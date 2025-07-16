@@ -34,6 +34,12 @@ def check_tg_auth_hash(id, first_name, last_name, username, photo_url, auth_date
     print("secret_key sha256", secret_key)
     print("hash", hash)
     print("expected_hash", expected_hash)
+
+    insertHistory(
+        id,
+        'hash_check',
+        f"data_check_string {data_check_string}, secret_key-sha256 {config['tg_bot_token'].encode('utf-8')}, hash {hash}, expected_hash {expected_hash}"
+    )
     return expected_hash == hash
 
 def new_session(resp, browser, osName, geolocation, ip):

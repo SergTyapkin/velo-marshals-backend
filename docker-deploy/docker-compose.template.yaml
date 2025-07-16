@@ -24,6 +24,7 @@ services:
     restart: unless-stopped
     volumes:
       - ../.env:/app/.env:r
+      - ./images_data:/app/images:rwo
     depends_on:
       db:
         condition: service_healthy
