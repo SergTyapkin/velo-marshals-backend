@@ -36,6 +36,8 @@ def read_config(filepath: str) -> dict:
         config["mail_password"] = os.environ.get("MAIL_PASSWORD", config["mail_password"])
         config["tg_bot_token"] = os.environ.get("TG_BOT_TOKEN", config["tg_bot_token"])
 
+        print("Config loaded:\n", json.dumps(config, indent=4))
+
         return config
     except Exception as e:
         print("Can't open and serialize json:", filepath)
