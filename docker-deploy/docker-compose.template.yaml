@@ -14,13 +14,13 @@ services:
       - VERSION
       - DEBUG
       - DB_ECHO_LOG
-      - TG_BOT_TOKEN
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_HOST=${DB_CONTAINER_NAME}
       - DB_PORT=${POSTGRES_PORT}
       - DB_NAME=${POSTGRES_DB}
       - MAIL_PASSWORD
+      - TG_BOT_TOKEN
     restart: unless-stopped
     volumes:
       - ../.env:/app/.env:r

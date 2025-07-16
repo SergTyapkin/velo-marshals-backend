@@ -21,26 +21,28 @@ app = Blueprint('user', __name__)
 
 def check_tg_auth_hash(id, first_name, last_name, username, photo_url, auth_date, hash):
     data_check_string = \
-        f"auth_date={auth_date}" if auth_date else "" + \
-        f"\nfirst_name={first_name}" if first_name else "" + \
-        f"\nid={id}" if id else "" + \
-        f"\nlast_name={last_name}" if last_name else "" + \
-        f"\nphoto_url={photo_url}" if photo_url else "" + \
-        f"\nusername={username}" if username else ""
+        (f"auth_date={auth_date}" if auth_date else "") + \
+        (f"\nfirst_name={first_name}" if first_name else "") + \
+        (f"\nid={id}" if id else "") + \
+        (f"\nlast_name={last_name}" if last_name else "") + \
+        (f"\nphoto_url={photo_url}" if photo_url else "") + \
+        (f"\nusername={username}" if username else "")
 
     secret_key = hashlib.sha256(config["tg_bot_token"].encode('utf-8')).digest()
     expected_hash = hmac.new(secret_key, bytes(data_check_string, 'utf-8'), hashlib.sha256).hexdigest()
-    print("data_check_string", data_check_string)
-    print("secret_key sha256", secret_key)
-    print("hash", hash)
-    print("expected_hash", expected_hash)
 
+    authTime = datetime.datetime.fromtimestamp(auth_date)
+    currentTime = datetime.datetime.now()
     insertHistory(
         None,
-        'hash_check',
-        f"data_check_string {data_check_string}, secret_key-sha256 {config['tg_bot_token'].encode('utf-8')}, hash {hash}, expected_hash {expected_hash}"
+        'check_auth',
+        f'data_check_string={data_check_string}, token={config["tg_bot_token"]}, expected_hash={expected_hash}, hash={hash}, authTime={authTime}, authTime={currentTime}, diff={currentTime-authTime}'
     )
-    return expected_hash == hash
+    return (
+            (currentTime - authTime).total_seconds() < 60 * 5 and  # 5 minutes
+            expected_hash == hash
+    )
+
 
 def new_session(resp, browser, osName, geolocation, ip):
     token = str(uuid.uuid4())
@@ -74,6 +76,7 @@ def new_secret_code(userId, type, hours=1):
 
     return code
 
+
 @app.route("/auth", methods=["POST"])
 def userAuth():
     try:
@@ -98,6 +101,11 @@ def userAuth():
     if not resp:
         return jsonResponse("Пользователь еще не зарегистрирован", HTTP_NOT_FOUND)
 
+    insertHistory(
+        resp['id'],
+        'account',
+        'Login'
+    )
     return new_session(resp, clientBrowser, clientOS, detectGeoLocation(), request.environ['IP_ADDRESS'])
 
 
@@ -111,6 +119,12 @@ def userSessionDelete(userData):
 
     res = jsonResponse("Вы вышли из аккаунта")
     res.set_cookie("session_token", "", max_age=-1, httponly=True, samesite="none", secure=True)
+
+    insertHistory(
+        userData['id'],
+        'account',
+        'Logout'
+    )
     return res
 
 
@@ -215,13 +229,19 @@ def userCreate():
     middleName = middleName.strip()
 
     if not check_tg_auth_hash(tgId, tgFirstName, tgLastName, tgUsername, tgPhotoUrl, tgAuthDate, tgHash):
-        return jsonResponse("Хэш авторизации TG не совпадает с данными", HTTP_INVALID_AUTH_DATA)
+        return jsonResponse("Хэш авторизации TG не совпадает с данными или авторизация была слишком давно", HTTP_INVALID_AUTH_DATA)
 
     try:
-        resp = DB.execute(SQLUser.insertUser, [tgId, tgUsername, avatarUrl, email, tel, familyName, givenName, middleName])
+        resp = DB.execute(SQLUser.insertUser,
+                          [tgId, tgUsername, avatarUrl, email, tel, familyName, givenName, middleName])
     except:
         return jsonResponse("TG, телефон или email заняты", HTTP_DATA_CONFLICT)
 
+    insertHistory(
+        resp['id'],
+        'account',
+        'Signup'
+    )
     return new_session(resp, clientBrowser, clientOS, detectGeoLocation(), request.environ['IP_ADDRESS'])
 
 
@@ -282,12 +302,21 @@ def userUpdate(userData):
 
     try:
         if userData['caneditusersdata']:
-            resp = DB.execute(SQLUser.adminUpdateUserById, [givenName, familyName, middleName, email, tel, avatarUrl, userId])
+            resp = DB.execute(SQLUser.adminUpdateUserById,
+                              [givenName, familyName, middleName, email, tel, avatarUrl, userId])
         else:
-            resp = DB.execute(SQLUser.updateUserById, [givenName, familyName, middleName, email, tel, avatarUrl, level, userId, tgUsername, tgId, canEditAchievements, canAssignAchievements, canEditRegistrations, canEditEvents, canEditUsersData, canEditDocs, canExecuteSQL, canEditHistory])
+            resp = DB.execute(SQLUser.updateUserById,
+                              [givenName, familyName, middleName, email, tel, avatarUrl, level, userId, tgUsername,
+                               tgId, canEditAchievements, canAssignAchievements, canEditRegistrations, canEditEvents,
+                               canEditUsersData, canEditDocs, canExecuteSQL, canEditHistory])
     except:
         return jsonResponse("Имя пользователя или email заняты", HTTP_DATA_CONFLICT)
 
+    insertHistory(
+        userId,
+        'account',
+        f'Update by user #{userData["id"]}: {json.dumps(req)}'
+    )
     return jsonResponse(resp)
 
 
@@ -304,10 +333,15 @@ def userDelete(userData):
         return jsonResponse("Недостаточно прав доступа", HTTP_NO_PERMISSIONS)
 
     DB.execute(SQLUser.deleteUserById, [userId])
+
+    insertHistory(
+        userId,
+        'account',
+        f'Delete by user #{userData["id"]}'
+    )
     return jsonResponse("Пользователь удален")
 
 
-@app.route("/email/confirm", methods=["POST"])
 @login_required
 def userConfirmEmailSendMessage(userData):
     email = userData['email']
@@ -320,8 +354,14 @@ def userConfirmEmailSendMessage(userData):
 
     send_email(email,
                f"Подтверждение регистрации на {config['project_name']}",
-               emails.confirmEmail(f"/image/{userData['avatarUrl']}", userData['givenname'] + ' ' + userData['familyname'], secretCode))
+               emails.confirmEmail(f"/image/{userData['avatarUrl']}",
+                                   userData['givenname'] + ' ' + userData['familyname'], secretCode))
 
+    insertHistory(
+        userData['id'],
+        'account',
+        f'Email for confirmation sent'
+    )
     return jsonResponse("Ссылка для подтверждения email выслана на почту " + email)
 
 
@@ -337,6 +377,11 @@ def userConfirmEmail():
     if not resp:
         return jsonResponse("Неверный одноразовый код", HTTP_INVALID_AUTH_DATA)
 
+    insertHistory(
+        resp['id'],
+        'account',
+        f'Email confirmed'
+    )
     return jsonResponse("Адрес email подтвержден")
 
 
