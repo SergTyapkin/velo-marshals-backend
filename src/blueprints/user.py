@@ -207,12 +207,12 @@ def userCreate():
     try:
         req = request.json
         tgId = req['tgId']
-        tgUsername = req['tgUsername']
+        tgUsername = req.get('tgUsername')
         tgHash = req['tgHash']
         tgAuthDate = req['tgAuthDate']
-        tgPhotoUrl = req['tgPhotoUrl']
-        tgFirstName = req['tgFirstName']
-        tgLastName = req['tgLastName']
+        tgPhotoUrl = req.get('tgPhotoUrl')
+        tgFirstName = req.get('tgFirstName')
+        tgLastName = req.get('tgLastName')
         email = req['email']
         tel = req['tel']
         avatarUrl = req['avatarUrl']
