@@ -1,3 +1,4 @@
+import json
 import random
 import uuid
 
@@ -97,7 +98,7 @@ def userAuth():
     if not check_tg_auth_hash(tgId, tgFirstName, tgLastName, tgUsername, tgPhotoUrl, tgAuthDate, tgHash):
         return jsonResponse("Хэш авторизации TG не совпадает с данными", HTTP_INVALID_AUTH_DATA)
 
-    resp = DB.execute(SQLUser.selectUserByTgId, [tgId])
+    resp = DB.execute(SQLUser.selectUserIdByTgId, [tgId])
     if not resp:
         return jsonResponse("Пользователь еще не зарегистрирован", HTTP_NOT_FOUND)
 
@@ -179,17 +180,17 @@ def userGet(userData):
             })
         userData['completedevents'] = resEvents
 
+    if tgId is not None:  # return user data by tgId
+        user = DB.execute(SQLUser.selectUserIdByTgId, [tgId])
+        if not user:
+            return jsonResponse("Пользователя с таким tgId не существует", HTTP_NOT_FOUND)
+        return jsonResponse(user)
+
     if userId is None:  # return self user data
         if userData is None:
             return jsonResponse("Не авторизован", HTTP_INVALID_AUTH_DATA)
         addEvents(userData)
         return jsonResponse(userData)
-
-    if tgId is None:  # return user data by tgId
-        user = DB.execute(SQLUser.selectUserByTgId, [tgId])
-        if not user:
-            return jsonResponse("Пользователя с таким tgId не существует", HTTP_NOT_FOUND)
-        return jsonResponse(user)
 
     # get another user data
     if userData['caneditusersdata']:
@@ -240,7 +241,7 @@ def userCreate():
     insertHistory(
         resp['id'],
         'account',
-        'Signup'
+        f'Create: {json.dumps(req)}'
     )
     return new_session(resp, clientBrowser, clientOS, detectGeoLocation(), request.environ['IP_ADDRESS'])
 

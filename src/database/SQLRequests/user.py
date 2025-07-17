@@ -20,7 +20,7 @@ insertSecretCode = \
     "RETURNING *"
 
 # ----- SELECTS -----
-selectUserByTgId = \
+selectUserIdByTgId = \
     f"SELECT id FROM users " \
     "WHERE tgId = %s"
 
