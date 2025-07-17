@@ -83,12 +83,12 @@ def userAuth():
     try:
         req = request.json
         tgId = req['tgId']
-        tgUsername = req['tgUsername']
+        tgUsername = req.get('tgUsername')
         tgHash = req['tgHash']
         tgAuthDate = req['tgAuthDate']
-        tgPhotoUrl = req['tgPhotoUrl']
-        tgFirstName = req['tgFirstName']
-        tgLastName = req['tgLastName']
+        tgPhotoUrl = req.get('tgPhotoUrl')
+        tgFirstName = req.get('tgFirstName')
+        tgLastName = req.get('tgLastName')
         clientBrowser = req.get('clientBrowser') or 'Unknown browser'
         clientOS = req.get('clientOS') or 'Unknown OS'
     except:
