@@ -94,11 +94,10 @@ def userAuth():
     except:
         return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
 
-    print("POST /auth", json.dumps(req))
     if not check_tg_auth_hash(tgId, tgFirstName, tgLastName, tgUsername, tgPhotoUrl, tgAuthDate, tgHash):
         return jsonResponse("Хэш авторизации TG не совпадает с данными", HTTP_INVALID_AUTH_DATA)
 
-    resp = DB.execute(SQLUser.selectUserIdByTgId, [tgId])
+    resp = DB.execute(SQLUser.selectUserIdByTgId, [str(tgId)])
     if not resp:
         return jsonResponse("Пользователь еще не зарегистрирован", HTTP_NOT_FOUND)
 
