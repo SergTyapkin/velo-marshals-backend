@@ -181,7 +181,7 @@ def userGet(userData):
         userData['completedevents'] = resEvents
 
     if tgId is not None:  # return user data by tgId
-        user = DB.execute(SQLUser.selectUserIdByTgId, [tgId])
+        user = DB.execute(SQLUser.selectUserIdByTgId, [str(tgId)])
         if not user:
             return jsonResponse("Пользователя с таким tgId не существует", HTTP_NOT_FOUND)
         return jsonResponse(user)
