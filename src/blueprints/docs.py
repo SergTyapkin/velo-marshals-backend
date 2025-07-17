@@ -18,8 +18,8 @@ def docsGet(userId):
         id = req.get('id')
 
         search = req.get('search')
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     if id is not None:  # get single doc
         docData = DB.execute(SQLDocs.selectDocById, [id])
@@ -39,8 +39,8 @@ def docCreate(userData):
         req = request.json
         title = req['title']
         text = req['text']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     doc = DB.execute(SQLDocs.insertDoc, [title, text, userData['id'], userData['id']])
 
@@ -61,8 +61,8 @@ def docUpdate(userData):
         id = req['id']
         title = req.get('title')
         text = req.get('text')
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     docData = DB.execute(SQLDocs.selectDocById, [id])
     if docData is None:
@@ -88,8 +88,8 @@ def docDelete(userData):
     try:
         req = request.json
         id = req['id']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     DB.execute(SQLDocs.deleteDocById, [id])
 

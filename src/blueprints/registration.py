@@ -15,8 +15,8 @@ def getUnvotedRegistrations(userData):
     try:
         req = request.json
         eventId = req['eventId']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     resp = DB.execute(SQLEvents.selectRegistrationsUnconfirmedByEventid, [eventId], manyResults=True)
     list_times_to_str(resp)
@@ -29,8 +29,8 @@ def getRegistrationsByEvent(userData):
     try:
         req = request.json
         eventId = req['eventId']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     resp = DB.execute(SQLEvents.selectRegistrationsByEventid, [eventId], manyResults=True)
     if resp is None:
@@ -47,8 +47,8 @@ def registerToEvent(userData):
         eventId = req['eventId']
         userId = req['userId']
         userComment = req.get('userComment')
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     if (userId != userData['id']) and (not userData['caneditregistrations']):
         return jsonResponse("Недостаточно прав доступа", HTTP_NO_PERMISSIONS)
@@ -81,8 +81,8 @@ def notRegisterToEvent(userData):
         req = request.json
         eventId = req['eventId']
         userId = req['userId']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     if (userId != userData['id']) and (not userData['caneditregistrations']):
         return jsonResponse("Недостаточно прав доступа", HTTP_NO_PERMISSIONS)
@@ -119,8 +119,8 @@ def updateRegistrationData(userData):
         lapsPassed = req.get('lapsPassed')
         cameDate = req.get('leaveDate')
         leaveDate = req.get('leaveDate')
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     registrationData = DB.execute(SQLEvents.selectRegistrationById, [id])
     if registrationData is None:
@@ -154,8 +154,8 @@ def updateSelfRegistrationComment(userData):
         req = request.json
         id = req['id']
         userComment = req['userComment']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     registrationData = DB.execute(SQLEvents.selectRegistrationById, [id])
     if registrationData is None:
@@ -179,8 +179,8 @@ def updateCameDate(userData):
     try:
         req = request.json
         id = req['id']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     registrationData = DB.execute(SQLEvents.updateRegistrationCameDateById, [id])
     if registrationData is None:
@@ -201,8 +201,8 @@ def updateLeaveDate(userData):
     try:
         req = request.json
         id = req['id']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     registrationData = DB.execute(SQLEvents.updateRegistrationLeaveDateById, [id])
     if registrationData is None:
@@ -223,8 +223,8 @@ def updateIncreaseLapsPassed(userData):
     try:
         req = request.json
         id = req['id']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     registrationData = DB.execute(SQLEvents.updateIncreaseRegistrationLapsPassedById, [id])
     if registrationData is None:

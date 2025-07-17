@@ -15,8 +15,8 @@ def equipmentGet(userId):
     try:
         req = request.args
         eventId = req['eventId']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     equipment = DB.execute(SQLEquipment.selectEquipmentsByEventId, [eventId], manyResults=True)
     return jsonResponse({"equipment": equipment})
@@ -33,8 +33,8 @@ def equipmentCreate(userData):
         previewUrl = req.get('previewUrl')
         amountTotal = req.get('amountTotal')
         isNeedsToReturn = req.get('isNeedsToReturn')
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     equipment = DB.execute(SQLEquipment.insertEquipment,
                            [title, description, previewUrl, amountTotal, isNeedsToReturn, eventId])
@@ -59,8 +59,8 @@ def equipmentUpdate(userData):
         previewUrl = req.get('previewUrl')
         amountTotal = req.get('amountTotal')
         isNeedsToReturn = req.get('isNeedsToReturn')
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     equipmentData = DB.execute(SQLEquipment.selectEquipmentById, [id])
     if equipmentData is None:
@@ -90,8 +90,8 @@ def equipmentDelete(userData):
     try:
         req = request.json
         id = req['id']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     DB.execute(SQLEquipment.deleteEquipmentById, [id])
 
@@ -110,8 +110,8 @@ def equipmentDelete(userData):
     try:
         req = request.json
         eventId = req['eventId']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     equipment = DB.execute(SQLEquipment.selectEquipmentUsersHoldersByEquipmentIdEventId, [eventId], manyResults=True)
 
@@ -125,8 +125,8 @@ def equipmentDelete(userData):
         req = request.json
         userId = req['userId']
         eventId = req['eventId']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     equipment = DB.execute(SQLEquipment.selectUserEquipmentsByUseridEventId, [userId, eventId])
 
@@ -139,8 +139,8 @@ def equipmentDelete(userData):
     try:
         req = request.json
         eventId = req['eventId']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     history = DB.execute(SQLEquipment.selectEquipmentsHistoryByEventId, [eventId], manyResults=True)
 
@@ -155,8 +155,8 @@ def equipmentDelete(userData):
         userId = req['userId']
         equipmentId = req['equipmentId']
         amountHolds = req['amountHolds']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     if userId != userData['userId'] and not userData['caneditevents']:
         return jsonResponse("Нет прав доступа на запись оборудования на другого пользователя", HTTP_NOT_FOUND)
@@ -178,8 +178,8 @@ def equipmentDelete(userData):
         req = request.json
         id = req['id']
         amount = req['amount']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     equipment = DB.execute(SQLEquipment.updateUserEquipmentAmountHoldsById, [amount, id])
 
@@ -198,8 +198,8 @@ def equipmentDelete(userData):
     try:
         req = request.json
         id = req['id']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     DB.execute(SQLEquipment.deleteUserEquipmentById, [id])
 

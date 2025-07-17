@@ -21,8 +21,8 @@ def eventsGet(userData):
         search = req.get('search')
         registrationId = req.get('registrationId')
         type = req.get('type')
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     if id is not None:  # get single event
         eventData = DB.execute(SQLEvents.selectEventById, [id])
@@ -58,8 +58,8 @@ def eventCreate(userData):
         customCSS = req.get('customCSS')
         lapDistanceKm = req.get('lapDistanceKm')
         medalPreviewUrl = req.get('medalPreviewUrl')
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     event = DB.execute(SQLEvents.insertEvent, [title, description, routeDescription, previewUrl, customCSS, lapDistanceKm, medalPreviewUrl, userData['id'], startDate, cameDate])
     times_to_str(event)
@@ -88,8 +88,8 @@ def eventUpdate(userData):
         customCSS = req.get('customCSS')
         lapDistanceKm = req.get('lapDistanceKm')
         medalPreviewUrl = req.get('medalPreviewUrl')
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     eventData = DB.execute(SQLEvents.selectEventById, [id])
     if eventData is None:
@@ -124,8 +124,8 @@ def eventDelete(userData):
     try:
         req = request.json
         id = req['id']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     DB.execute(SQLEvents.deleteEventById, [id])
 

@@ -17,8 +17,8 @@ def achievementsGet(userId_logined):
         req = request.args
         id = req.get('id')
         search = req.get('search')
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     if id is not None:  # get single achievement
         achievementData = DB.execute(SQLAchievements.selectAchievementById, [id])
@@ -42,8 +42,8 @@ def achievementCreate(userData):
         description = req.get('description')
         levels = req['levels']
         isSpecial = req['isSpecial']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     achievement = DB.execute(SQLAchievements.insertAchievement, [name, description, levels, userData['id'], isSpecial])
 
@@ -67,8 +67,8 @@ def achievementUpdate(userData):
         levels = req.get('levels')
         previewUrl = req.get('previewUrl')
         isSpecial = req.get('isSpecial')
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     achievementData = DB.execute(SQLAchievements.selectAchievementById, [id])
     if achievementData is None:
@@ -97,8 +97,8 @@ def achievementDelete(userData):
     try:
         req = request.json
         id = req['id']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     DB.execute(SQLAchievements.deleteAchievementById, [id])
 
@@ -119,8 +119,8 @@ def userAchievementsGet(userId_logined):
     try:
         req = request.args
         userId = req['userId']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     userAchievements = DB.execute(SQLAchievements.selectUserAchievementsByUserid, [userId], manyResults=True)
     list_times_to_str(userAchievements)
@@ -135,8 +135,8 @@ def userAchievementCreate(userData):
         userId = req['userId']
         achievementId = req['achievementId']
         level = req['level']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     userAchievements = DB.execute(SQLAchievements.selectUserAchievementsByUserid, [userId], manyResults=True)
     for ach in userAchievements:  # delete another levels of this achievement
@@ -160,8 +160,8 @@ def userAchievementUpdate(userData):
         req = request.json
         id = req['id']
         level = req['level']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     achievement = DB.execute(SQLAchievements.updateUserAchievementLevelById, [level, id])
 
@@ -180,8 +180,8 @@ def userAchievementDelete(userData):
     try:
         req = request.json
         id = req['id']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     DB.execute(SQLAchievements.deleteUserAchievementById, [id])
 

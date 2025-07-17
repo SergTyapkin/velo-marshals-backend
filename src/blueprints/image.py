@@ -49,8 +49,8 @@ def imageUpload(userData):
     try:
         req = request.json
         dataUrl = req['dataUrl']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     [dataUrl, base64Data] = dataUrl.split(',')
     imageType = dataUrl[_leftLen: -_rightLen]
@@ -108,8 +108,8 @@ def imageDelete(userId):
     try:
         req = request.json
         imageId = req['imageId']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     if config['save_images_to_db']:
         resp = DB.execute(SQLImages.selectImageById, [imageId])

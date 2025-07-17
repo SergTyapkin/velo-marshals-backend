@@ -91,8 +91,8 @@ def userAuth():
         tgLastName = req.get('tgLastName')
         clientBrowser = req.get('clientBrowser') or 'Unknown browser'
         clientOS = req.get('clientOS') or 'Unknown OS'
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     if not check_tg_auth_hash(tgId, tgFirstName, tgLastName, tgUsername, tgPhotoUrl, tgAuthDate, tgHash):
         return jsonResponse("Хэш авторизации TG не совпадает с данными", HTTP_INVALID_AUTH_DATA)
@@ -165,8 +165,8 @@ def userGet(userData):
         req = request.args
         userId = req.get('id')
         tgId = req.get('tgId')
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     def addEvents(userData):
         allEvents = DB.execute(SQLEvents.selectEvents({"registrationId": userData['id']}), manyResults=True)
@@ -221,8 +221,8 @@ def userCreate():
         middleName = req.get('middleName')
         clientBrowser = req.get('clientBrowser', 'Unknown browser')
         clientOS = req.get('clientOS', 'Unknown OS')
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
     email = email.strip().lower()
     familyName = familyName.strip()
     givenName = givenName.strip()
@@ -269,8 +269,8 @@ def userUpdate(userData):
         canEditDocs = req.get('canEditDocs')
         canExecuteSQL = req.get('canExecuteSQL')
         canEditHistory = req.get('canEditHistory')
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     if userData['id'] != userId:
         if not userData['caneditusersdata']:
@@ -326,8 +326,8 @@ def userDelete(userData):
     try:
         req = request.json
         userId = req['userId']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     if (userData['id'] != userId) and (not userData['caneditusersdata']):
         return jsonResponse("Недостаточно прав доступа", HTTP_NO_PERMISSIONS)
@@ -370,8 +370,8 @@ def userConfirmEmail():
     try:
         req = request.json
         code = req['code']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     resp = DB.execute(SQLUser.updateUserConfirmationBySecretcodeType, [code, "email"])
     if not resp:
@@ -390,8 +390,8 @@ def usersGetAll():
     try:
         req = request.args
         search = req.get('search')
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     resp = DB.execute(SQLUser.selectUsersByFilters(req), manyResults=True)
     return jsonResponse({'users': resp})

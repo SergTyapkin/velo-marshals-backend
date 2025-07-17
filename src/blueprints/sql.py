@@ -16,8 +16,8 @@ def executeSQL(userData):
     try:
         req = request.json
         sqlText = req['sql']
-    except:
-        return jsonResponse("Не удалось сериализовать json", HTTP_INVALID_DATA)
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     try:
         resp = DB.execute(sqlText, manyResults=True)
