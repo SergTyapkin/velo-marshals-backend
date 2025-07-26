@@ -50,7 +50,7 @@ def registerToEvent(userData):
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
-    if (userId != userData['id']) and (not userData['caneditregistrations']):
+    if (str(userId) != str(userData['id'])) and (not userData['caneditregistrations']):
         return jsonResponse("Недостаточно прав доступа", HTTP_NO_PERMISSIONS)
 
     eventData = DB.execute(SQLEvents.selectEventById, [eventId])
@@ -76,7 +76,7 @@ def registerToEvent(userData):
 
 @app.route("/event", methods=["DELETE"])
 @login_required
-def notRegisterToEvent(userData):
+def unregisterToEvent(userData):
     try:
         req = request.json
         eventId = req['eventId']
@@ -84,7 +84,7 @@ def notRegisterToEvent(userData):
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
-    if (userId != userData['id']) and (not userData['caneditregistrations']):
+    if (str(userId) != str(userData['id'])) and (not userData['caneditregistrations']):
         return jsonResponse("Недостаточно прав доступа", HTTP_NO_PERMISSIONS)
 
     eventData = DB.execute(SQLEvents.selectEventById, [eventId])

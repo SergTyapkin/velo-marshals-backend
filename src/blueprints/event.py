@@ -27,10 +27,10 @@ def eventsGet(userData):
     if id is not None:  # get single event
         eventData = DB.execute(SQLEvents.selectEventById, [id])
         times_to_str(eventData)
+        registrations = DB.execute(SQLEvents.selectRegistrationsByEventid, [eventData['id']], manyResults=True)
+        eventData['registrationscount'] = len(registrations)
         if userData['caneditevents']:
-            registrations = DB.execute(SQLEvents.selectRegistrationsByEventid, [eventData['id']], manyResults=True)
             eventData['registrations'] = registrations
-            eventData['registrationscount'] = len(registrations)
         res = DB.execute(SQLEvents.selectRegistrationByUseridEventid, [userData['id'], id])
         eventData['isyouregistered'] = bool(res)
         return jsonResponse(eventData)
@@ -41,6 +41,8 @@ def eventsGet(userData):
     for event in events:
         countRes = DB.execute(SQLEvents.selectRegistrationsCountByEventid, [event['id']])
         event['registrationscount'] = countRes.get('count') or 0
+        res = DB.execute(SQLEvents.selectRegistrationByUseridEventid, [userData['id'], event['id']])
+        event['isyouregistered'] = bool(res)
     return jsonResponse({"events": events})
 
 

@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
     id               SERIAL PRIMARY KEY,
     tgUsername       TEXT DEFAULT NULL UNIQUE,
     tgId             TEXT DEFAULT NULL UNIQUE,
-    email            TEXT NOT NULL UNIQUE,
+    email            TEXT DEFAULT NULL UNIQUE,
     isConfirmedEmail BOOLEAN NOT NULL DEFAULT FALSE,
     tel              TEXT NOT NULL UNIQUE,
     avatarUrl        TEXT,
@@ -65,12 +65,12 @@ CREATE TABLE IF NOT EXISTS registrations (
     isConfirmed  BOOLEAN DEFAULT NULL,
     userComment  TEXT DEFAULT NULL,
     adminComment TEXT DEFAULT NULL,
-    level        INT NOT NULL,
-    salary       INT NOT NULL,
-    taskText     TEXT,
+    level        INT DEFAULT NULL,
+    salary       INT DEFAULT NULL,
+    taskText     TEXT DEFAULT NULL,
     cameDate     TIMESTAMP WITH TIME ZONE DEFAULT NULL,
     leaveDate    TIMESTAMP WITH TIME ZONE DEFAULT NULL,
-    lapsPassed   INT NOT NULL DEFAULT 0,
+    lapsPassed   FLOAT NOT NULL DEFAULT 0,
     UNIQUE (userId, eventId)
 );
 

@@ -19,7 +19,7 @@ def hmac_sha256(key: str, string: str) -> str:
 
 
 def compare_user_session_ip(dbSession):
-    print(dbSession['ip'], request.environ['IP_ADDRESS'])
+    # print(dbSession['ip'], request.environ['IP_ADDRESS'])
     if dbSession['ip'] == request.environ['IP_ADDRESS']:
         return None  # ok
     return jsonResponse('IP адрес не совпаадет с IP адресом, с которого была открыта сессия', HTTP_INVALID_AUTH_DATA)
