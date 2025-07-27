@@ -34,11 +34,6 @@ def check_tg_auth_hash(id, first_name, last_name, username, photo_url, auth_date
 
     authTime = datetime.datetime.fromtimestamp(auth_date)
     currentTime = datetime.datetime.now()
-    insertHistory(
-        None,
-        'check_auth',
-        f'data_check_string={data_check_string}, token={config["tg_bot_token"]}, expected_hash={expected_hash}, hash={hash}, authTime={authTime}, authTime={currentTime}, diff={currentTime-authTime}'
-    )
     return (
             (currentTime - authTime).total_seconds() < 60 * float(config["allow_auth_period_min"]) and
             expected_hash == hash
