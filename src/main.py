@@ -1,6 +1,12 @@
 import os
 from flask import Flask
+from flask import g, request
 from flask_mail import Mail
+
+from colors import red, blue, green, purple, cyan, yellow, light_gray
+import datetime
+import time
+from rfc3339 import rfc3339
 
 from src.blueprints.user import app as user_app
 from src.blueprints.sql import app as sql_app
@@ -52,6 +58,56 @@ def error500(err):
     print(err)
     return jsonResponse("500 внутренняя ошибка сервера", HTTP_INTERNAL_ERROR)
 
+
+@app.before_request
+def start_timer():
+    g.start = time.time()
+
+@app.after_request
+def log_request(response):
+    now = time.time()
+    duration = round(now - g.start, 2)
+    dt = datetime.datetime.fromtimestamp(now)
+    timestamp = rfc3339(dt, utc=True)
+
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    host = request.host.split(':', 1)[0]
+    args = dict(request.args)
+
+    json = ''
+    try:
+        json = request.json
+    except:
+        pass
+
+    log_params = [
+        (timestamp, purple),
+        (request.method, blue),
+        (request.path, blue),
+        (response.status_code, yellow),
+        (f'duration={duration}s', green),
+        (f'ip={ip}', red),
+        (f'host={host}', red),
+        (f'query={args}', blue),
+        (f'body={json}', cyan),
+        (f'RES_code={response.status_code}', light_gray),
+        (f'RES_data={response.get_data().decode()}', light_gray),
+    ]
+
+    request_id = request.headers.get('X-Request-ID')
+    if request_id:
+        log_params.append(('request_id', request_id, yellow))
+
+    parts = []
+    for value, color in log_params:
+        part = value
+        coloredPart = color(part)
+        parts.append(coloredPart)
+    line = " ".join(parts)
+
+    app.logger.info(line)
+
+    return response
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', config['port']))
