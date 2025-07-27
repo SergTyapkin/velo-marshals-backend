@@ -26,7 +26,7 @@ selectUserIdByTgId = \
 
 selectUserIdByTgUsernameOrTgId = \
     f"SELECT id FROM users " \
-    "WHERE tgUsername = %s OR " \
+    "WHERE LOWER(tgUsername) = LOWER(%s) OR " \
     "tgId = %s"
 
 selectUserById = \
@@ -76,7 +76,7 @@ selectSecretCodeByUserIdType = \
 updateUserTgDataById = \
     "UPDATE users SET " \
     "tgId = %s, " \
-    "tgUsername = %s, " \
+    "tgUsername = LOWER(%s), " \
     "avatarUrl = %s " \
     "WHERE id = %s " \
     "RETURNING *"
