@@ -92,7 +92,7 @@ def userAuth():
     if not check_tg_auth_hash(tgId, tgFirstName, tgLastName, tgUsername, tgPhotoUrl, tgAuthDate, tgHash):
         return jsonResponse("Хэш авторизации TG не совпадает с данными", HTTP_INVALID_AUTH_DATA)
 
-    resp = DB.execute(SQLUser.selectUserIdByTgUsernameOrTgId, [str(tgUsername), str(tgId)])
+    resp = DB.execute(SQLUser.selectUserIdByTgUsernameOrTgId, [tgUsername, str(tgId)])
     if not resp:
         return jsonResponse("Пользователь еще не зарегистрирован", HTTP_NOT_FOUND)
 
@@ -103,7 +103,7 @@ def userAuth():
     )
 
     # Update tg user data
-    DB.execute(SQLUser.updateUserTgDataById, [str(tgId), str(tgUsername), str(tgPhotoUrl), resp['id']])
+    DB.execute(SQLUser.updateUserTgDataById, [str(tgId), tgUsername, tgPhotoUrl, resp['id']])
 
     return new_session(resp, clientBrowser, clientOS, detectGeoLocation(), request.environ['IP_ADDRESS'])
 
@@ -180,7 +180,7 @@ def userGet(userData):
         userData['completedevents'] = resEvents
 
     if tgUsername is not None or tgId is not None:  # return user data by tgUsername or tgId
-        user = DB.execute(SQLUser.selectUserIdByTgUsernameOrTgId, [str(tgUsername), str(tgId)])
+        user = DB.execute(SQLUser.selectUserIdByTgUsernameOrTgId, [tgUsername, str(tgId)])
         if not user:
             return jsonResponse("Пользователя с таким tgUsername или tgId не существует", HTTP_NOT_FOUND)
         return jsonResponse(user)
