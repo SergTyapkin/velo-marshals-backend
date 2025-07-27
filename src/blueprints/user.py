@@ -97,7 +97,7 @@ def userAuth():
     if not check_tg_auth_hash(tgId, tgFirstName, tgLastName, tgUsername, tgPhotoUrl, tgAuthDate, tgHash):
         return jsonResponse("Хэш авторизации TG не совпадает с данными", HTTP_INVALID_AUTH_DATA)
 
-    resp = DB.execute(SQLUser.selectUserIdByTgId, [str(tgId)])
+    resp = DB.execute(SQLUser.selectUserIdByTgUsername, [str(tgUsername)])
     if not resp:
         return jsonResponse("Пользователь еще не зарегистрирован", HTTP_NOT_FOUND)
 
