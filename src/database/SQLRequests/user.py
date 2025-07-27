@@ -24,9 +24,10 @@ selectUserIdByTgId = \
     f"SELECT id FROM users " \
     "WHERE tgId = %s"
 
-selectUserIdByTgUsername = \
+selectUserIdByTgUsernameOrTgId = \
     f"SELECT id FROM users " \
-    "WHERE tgUsername = %s"
+    "WHERE tgUsername = %s OR " \
+    "tgId = %s"
 
 selectUserById = \
     f"SELECT * FROM users " \
