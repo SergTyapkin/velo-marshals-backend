@@ -106,6 +106,10 @@ def userAuth():
         'account',
         'Login'
     )
+
+    # Update tg user data
+    DB.execute(SQLUser.updateUserTgDataById, [str(tgId), str(tgUsername), str(tgPhotoUrl), resp['id']])
+
     return new_session(resp, clientBrowser, clientOS, detectGeoLocation(), request.environ['IP_ADDRESS'])
 
 

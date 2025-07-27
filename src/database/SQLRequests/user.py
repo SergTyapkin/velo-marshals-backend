@@ -72,6 +72,14 @@ selectSecretCodeByUserIdType = \
     "expires > NOW()"
 
 # ----- UPDATES -----
+updateUserTgDataById = \
+    "UPDATE users SET " \
+    "tgId = %s, " \
+    "tgUsername = %s, " \
+    "avatarUrl = %s " \
+    "WHERE id = %s " \
+    "RETURNING *"
+
 updateUserById = \
     "UPDATE users SET " \
     "givenName = %s, " \
