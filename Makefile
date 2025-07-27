@@ -39,6 +39,10 @@ set-docker-not-sudo:
 	echo "[Make]: Running 'set-docker-not-sudo' target in Makefile..." && \
     bash ./docker-deploy/scripts/set-docker-not-sudo.sh
 
+make-dirs:
+	mkdir -p ./docker-deploy/images_data && \
+	mkdir -p ./docker-deploy/pg_data
+
 setup-env-file:
 	echo "[Make]: Running 'setup-env-file' target in Makefile..." && \
     bash ./docker-deploy/scripts/setup-env-file.sh
@@ -46,5 +50,6 @@ setup-env-file:
 all:
 	echo "[Make]: Running 'all' target in Makefile..." && \
 	make setup-env-file
+	make make-dirs
 	make setup-ci
 	make update

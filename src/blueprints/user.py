@@ -165,6 +165,7 @@ def userGet(userData):
         req = request.args
         userId = req.get('id')
         tgId = req.get('tgId')
+        tgUsername = req.get('tgUsername')
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
@@ -183,6 +184,12 @@ def userGet(userData):
         user = DB.execute(SQLUser.selectUserIdByTgId, [str(tgId)])
         if not user:
             return jsonResponse("Пользователя с таким tgId не существует", HTTP_NOT_FOUND)
+        return jsonResponse(user)
+
+    if tgUsername is not None:  # return user data by tgUsername
+        user = DB.execute(SQLUser.selectUserIdByTgUsername, [str(tgUsername)])
+        if not user:
+            return jsonResponse("Пользователя с таким tgUsername не существует", HTTP_NOT_FOUND)
         return jsonResponse(user)
 
     if userId is None:  # return self user data
