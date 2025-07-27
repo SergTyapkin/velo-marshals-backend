@@ -9,7 +9,7 @@ from src.database.SQLRequests import events as SQLEvents
 app = Blueprint('registrations', __name__)
 
 
-@app.route("/unconfirmed", methods=["GET"])
+@app.route("/event/unconfirmed", methods=["GET"])
 @login_and_can_edit_registrations_required
 def getUnvotedRegistrations(userData):
     try:
@@ -24,10 +24,10 @@ def getUnvotedRegistrations(userData):
 
 
 @app.route("/event", methods=["GET"])
-@login_required
+@login_and_can_edit_registrations_required
 def getRegistrationsByEvent(userData):
     try:
-        req = request.json
+        req = request.args
         eventId = req['eventId']
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
@@ -36,7 +36,7 @@ def getRegistrationsByEvent(userData):
     if resp is None:
         return jsonResponse("Событие не найдено", HTTP_NOT_FOUND)
 
-    return jsonResponse(resp)
+    return jsonResponse({'registrations': resp})
 
 
 @app.route("/event", methods=["POST"])
@@ -105,7 +105,7 @@ def unregisterToEvent(userData):
     return jsonResponse("Запись на событие удалена")
 
 
-@app.route("/event", methods=["PUT"])
+@app.route("", methods=["PUT"])
 @login_and_can_edit_registrations_required
 def updateRegistrationData(userData):
     try:

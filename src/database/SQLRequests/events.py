@@ -96,33 +96,33 @@ updateEventById = \
     "startDate = %s, " \
     "cameDate = %s, " \
     "previewUrl = %s, " \
-    "customCSS = %s " \
-    "lapDistanceKm = %s " \
+    "customCSS = %s, " \
+    "lapDistanceKm = %s, " \
     "medalPreviewUrl = %s " \
     "WHERE id = %s " \
     "RETURNING *"
 
 updateRegistrationUserCommentById = \
     "UPDATE registrations SET " \
-    "userComment = %s, " \
+    "userComment = %s " \
     "WHERE id = %s " \
     "RETURNING *"
 
 updateRegistrationCameDateById = \
     "UPDATE registrations SET " \
-    "cameDate = NOW(), " \
+    "cameDate = NOW() " \
     "WHERE id = %s " \
     "RETURNING *"
 
 updateRegistrationLeaveDateById = \
     "UPDATE registrations SET " \
-    "leaveDate = NOW(), " \
+    "leaveDate = NOW() " \
     "WHERE id = %s " \
     "RETURNING *"
 
 updateIncreaseRegistrationLapsPassedById = \
     "UPDATE registrations SET " \
-    "lapsPassed = lapsPassed + 1, " \
+    "lapsPassed = lapsPassed + 1 " \
     "WHERE id = %s " \
     "RETURNING *"
 
@@ -135,7 +135,7 @@ updateRegistrationById = \
     "taskText = %s, " \
     "lapsPassed = %s, " \
     "cameDate = %s, " \
-    "leaveDate = %s, " \
+    "leaveDate = %s " \
     "WHERE id = %s " \
     "RETURNING *"
 
