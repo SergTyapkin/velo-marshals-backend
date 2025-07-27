@@ -37,7 +37,7 @@ def selectEvents(filters):
             (f"cameDate < '{dateEnd}' AND " if dateEnd is not None else "") + \
             (f"LOWER(events.title) LIKE '%%{search.lower()}%%' AND " if search is not None else "") + \
             registrationWhere + typeStr + \
-            "ORDER BY events.cameDate"
+            "ORDER BY events.startDate"
 
 selectEventById = \
     "SELECT events.*, (users.givenName  || ' ' || users.familyName) as authorname, users.tgusername authortelegram, (events.cameDate >= NOW()) isinfuture FROM events " \
