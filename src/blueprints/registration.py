@@ -1,5 +1,7 @@
 from flask import Blueprint
 
+from src.TgBot.TgBot import TgBotMessageTexts
+from src.connections import TgBot
 from src.utils.access import *
 from src.utils.utils import *
 from src.database.databaseUtils import insertHistory
@@ -71,6 +73,12 @@ def registerToEvent(userData):
         f'Add registration on event: "{eventData["title"]}" #{eventId}'
     )
 
+    try:
+        fullUserData = DB.execute(SQLUser.selectUserById, [userId])
+        TgBot.sendMessage(fullUserData['tgid'], TgBotMessageTexts.registrationGotten, eventData["title"])
+    except Exception as err:
+        print("Error. Cannot select user and send message by tg bot", err)
+        pass
     return jsonResponse(response)
 
 
@@ -101,6 +109,13 @@ def unregisterToEvent(userData):
         'registration',
         f'Delete registration from event: "{eventData["title"]}" #{eventId}'
     )
+
+    try:
+        fullUserData = DB.execute(SQLUser.selectUserById, [userId])
+        TgBot.sendMessage(fullUserData['tgid'], TgBotMessageTexts.registrationCanceled, eventData["title"])
+    except Exception as err:
+        print("Error. Cannot select user and send message by tg bot", err)
+        pass
 
     return jsonResponse("Запись на событие удалена")
 
@@ -144,6 +159,16 @@ def updateRegistrationData(userData):
         f'Batch update registration: {json.dumps(req)}'
     )
 
+    initialIsConfirmed = req.get('isConfirmed')
+    if initialIsConfirmed is not None and initialIsConfirmed != registrationData['isconfirmed']:
+        try:
+            fullUserData = DB.execute(SQLUser.selectUserById, [registrationData['userid']])
+            fullEventData = DB.execute(SQLEvents.selectEventById, [registrationData['eventid']])
+            message = TgBotMessageTexts.registrationConfirmed if initialIsConfirmed else TgBotMessageTexts.registrationRejected
+            TgBot.sendMessage(fullUserData['tgid'], message, fullEventData['title'])
+        except Exception as err:
+            print("Error. Cannot select user and send message by tg bot", err)
+            pass
     return jsonResponse(response)
 
 
