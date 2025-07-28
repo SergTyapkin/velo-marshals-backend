@@ -250,7 +250,7 @@ def userCreate():
 def userUpdate(userData):
     try:
         req = request.json
-        userId = req['userId']
+        userId = req['id']
         givenName = req.get('givenName')
         familyName = req.get('familyName')
         middleName = req.get('middleName')
@@ -272,7 +272,7 @@ def userUpdate(userData):
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
-    if userData['id'] != userId:
+    if str(userData['id']) != str(userId):
         if not userData['caneditusersdata']:
             return jsonResponse("Недостаточно прав доступа", HTTP_NO_PERMISSIONS)
         userData = DB.execute(SQLUser.selectUserById, [userId])
@@ -303,12 +303,12 @@ def userUpdate(userData):
     try:
         if userData['caneditusersdata']:
             resp = DB.execute(SQLUser.adminUpdateUserById,
-                              [givenName, familyName, middleName, email, tel, avatarUrl, userId])
-        else:
-            resp = DB.execute(SQLUser.updateUserById,
                               [givenName, familyName, middleName, email, tel, avatarUrl, level, userId, tgUsername,
                                tgId, canEditAchievements, canAssignAchievements, canEditRegistrations, canEditEvents,
                                canEditUsersData, canEditDocs, canExecuteSQL, canEditHistory])
+        else:
+            resp = DB.execute(SQLUser.updateUserById,
+                              [givenName, familyName, middleName, email, tel, avatarUrl, userId])
     except:
         return jsonResponse("Имя пользователя или email заняты", HTTP_DATA_CONFLICT)
 
@@ -329,7 +329,7 @@ def userDelete(userData):
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
-    if (userData['id'] != userId) and (not userData['caneditusersdata']):
+    if (str(userData['id']) != str(userId)) and (not userData['caneditusersdata']):
         return jsonResponse("Недостаточно прав доступа", HTTP_NO_PERMISSIONS)
 
     DB.execute(SQLUser.deleteUserById, [userId])

@@ -160,7 +160,7 @@ def updateSelfRegistrationComment(userData):
     registrationData = DB.execute(SQLEvents.selectRegistrationById, [id])
     if registrationData is None:
         return jsonResponse("Такой регистрации не существует", HTTP_NOT_FOUND)
-    if registrationData['userid'] != userData['id'] and not userData['caneditregistrations']:
+    if str(registrationData['userid']) != str(userData['id']) and not userData['caneditregistrations']:
         return jsonResponse("Нет прав на редактирование чужого комментария", HTTP_NO_PERMISSIONS)
 
     insertHistory(

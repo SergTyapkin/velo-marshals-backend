@@ -76,7 +76,7 @@ selectSecretCodeByUserIdType = \
 updateUserTgDataById = \
     "UPDATE users SET " \
     "tgId = %s, " \
-    "tgUsername = LOWER(%s), " \
+    "tgUsername = %s, " \
     "avatarUrl = %s " \
     "WHERE id = %s " \
     "RETURNING *"
