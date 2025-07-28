@@ -9,6 +9,7 @@
     "db_password": "set_in_env",
     "mail_password": "set_in_env",
     "tg_bot_token": "set_in_env",
+    "tg_bot_enabled": false,
 
     "max_image_size_px": 512,
     "allow_auth_period_min": 30,

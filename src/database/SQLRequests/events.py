@@ -57,12 +57,14 @@ selectRegistrationByUseridEventid = \
 selectRegistrationsByEventid = \
     "SELECT registrations.*, (users.givenName  || ' ' || users.familyName) as username, users.avatarUrl useravatarurl, users.tel usertel, users.tgUsername usertgusername FROM registrations " \
     "JOIN users ON registrations.userid = users.id " \
-    "WHERE eventid = %s "
+    "WHERE eventid = %s " \
+    "ORDER BY registrations.id"
 
 selectRegistrationsUnconfirmedByEventid = \
     "SELECT registrations.*, (users.givenName  || ' ' || users.familyName) as username, users.avatarUrl useravatarurl, users.tel usertel, users.tgUsername usertgusername FROM registrations " \
     "JOIN users ON registrations.userid = users.id " \
-    "WHERE eventid = %s "
+    "WHERE eventid = %s " \
+    "ORDER BY registrations.id"
 
 selectRegistrationsByUserId = \
     "SELECT registrations.*, (users.givenName  || ' ' || users.familyName) as username, users.avatarUrl useravatarurl, users.tel usertel, users.tgUsername usertgusername, events.medalPreviewUrl as eventmedalpreviewurl, events.id as eventid, events.title as eventtitle FROM registrations " \

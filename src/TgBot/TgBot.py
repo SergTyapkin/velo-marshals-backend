@@ -15,12 +15,17 @@ class TgBotClass:
     def __new__(cls, config):
         if not hasattr(cls, 'instance'):
             cls.token = config['tg_bot_token']
+            cls.is_enabled = config['tg_bot_enabled']
             cls.thread = None
             cls.init(cls)
             cls.instance = super(TgBotClass, cls).__new__(cls)
         return cls.instance
 
     def init(self):
+        if not self.is_enabled:
+            print("TgBot not enabled in config")
+            return
+
         try:
             self.bot = telebot.TeleBot(self.token)
 
@@ -57,9 +62,14 @@ class TgBotClass:
         self.thread.start()
 
     def sendMessage(self, userTgId: str, MessageText: str, *values: list[str]):
+        if not self.is_enabled:
+            print("TgBot not enabled in config")
+            return
         message = MessageText % values
         print(f"TgBot send message to #{userTgId}:", message)
         self.bot.send_message(userTgId, message)
 
     def startBotPolling(self):
+        if not self.is_enabled:
+            return
         self.bot.polling(none_stop=True, interval=0)

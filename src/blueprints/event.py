@@ -33,8 +33,8 @@ def eventsGet(userData):
             eventData['registrations'] = registrations
         res = DB.execute(SQLEvents.selectRegistrationByUseridEventid, [userData['id'], id])
         eventData['isyouregistered'] = bool(res)
-        eventData['isyourregistrationconfirmed'] = res['isconfirmed']
-        eventData['yourcomment'] = res['usercomment']
+        eventData['isyourregistrationconfirmed'] = res['isconfirmed'] if res else None
+        eventData['yourcomment'] = res['usercomment'] if res else None
         return jsonResponse(eventData)
 
     # get events list by filters

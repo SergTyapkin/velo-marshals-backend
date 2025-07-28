@@ -36,6 +36,7 @@ def read_config(filepath: str) -> dict:
         config["db_password"] = os.environ.get("DB_PASSWORD", config["db_password"])
         config["mail_password"] = os.environ.get("MAIL_PASSWORD", config["mail_password"])
         config["tg_bot_token"] = os.environ.get("TG_BOT_TOKEN", config["tg_bot_token"])
+        config["tg_bot_enabled"] = str(os.environ.get("TG_BOT_ENABLED", config["tg_bot_enabled"])).lower() == 'true'
 
         if config['save_images_to_db'] is False:
             if not os.path.isdir(config['save_images_folder']):
