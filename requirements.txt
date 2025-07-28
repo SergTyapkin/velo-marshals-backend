@@ -7,3 +7,4 @@ Flask-Mail==0.9.1
 geoip2==4.7.0
 pycolors==0.1.2
 rfc3339==6.2
+pytelegrambotapi==4.28.0
