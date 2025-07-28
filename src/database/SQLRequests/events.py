@@ -18,9 +18,9 @@ def selectEvents(filters):
 
     typeStr = "1 = 1 "
     if type == 'future':
-        typeStr = "cameDate > NOW() "
+        typeStr = "startDate > NOW() "
     elif type == 'past':
-        typeStr = "cameDate <= NOW() "
+        typeStr = "startDate <= NOW() "
 
     registrationJoin = ""
     registrationWhere = ""
@@ -29,18 +29,18 @@ def selectEvents(filters):
         registrationWhere = f"r.userId = {filters['userId']} AND "
 
     return \
-            f"SELECT events.*, (users.givenName  || ' ' || users.familyName) as authorname, (events.cameDate >= NOW()) isinfuture FROM events " \
+            f"SELECT events.*, (users.givenName  || ' ' || users.familyName) as authorname, (events.startDate >= NOW()) isinfuture FROM events " \
             "LEFT JOIN users ON events.authorId = users.id " + \
             registrationJoin + \
             "WHERE " + \
-            (f"cameDate >= '{dateStart}' AND " if dateStart is not None else "") + \
-            (f"cameDate < '{dateEnd}' AND " if dateEnd is not None else "") + \
+            (f"startDate >= '{dateStart}' AND " if dateStart is not None else "") + \
+            (f"startDate < '{dateEnd}' AND " if dateEnd is not None else "") + \
             (f"LOWER(events.title) LIKE '%%{search.lower()}%%' AND " if search is not None else "") + \
             registrationWhere + typeStr + \
             "ORDER BY events.startDate"
 
 selectEventById = \
-    "SELECT events.*, (users.givenName  || ' ' || users.familyName) as authorname, users.tgusername authortelegram, (events.cameDate >= NOW()) isinfuture FROM events " \
+    "SELECT events.*, (users.givenName  || ' ' || users.familyName) as authorname, users.tgusername authortelegram, (events.startDate >= NOW()) isinfuture FROM events " \
     "LEFT JOIN users ON events.authorId = users.id " \
     "WHERE events.id = %s"
 
@@ -69,7 +69,7 @@ selectRegistrationsByUserId = \
     "JOIN users ON registrations.userid = users.id " \
     "JOIN events on registrations.eventid = events.id " \
     "WHERE userid = %s " \
-    "ORDER BY events.cameDate"
+    "ORDER BY events.startDate"
 
 selectRegistrationsCountByEventid = \
     "SELECT COUNT(*) count FROM registrations " \
