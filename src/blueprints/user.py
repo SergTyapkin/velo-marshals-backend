@@ -287,7 +287,7 @@ def userUpdate(userData):
             resp = DB.execute(SQLUser.adminUpdateUserById,
                               [givenName, familyName, middleName, email, tel, avatarUrl, level, userId, tgUsername,
                                tgId, canEditAchievements, canAssignAchievements, canEditRegistrations, canEditEvents,
-                               canEditUsersData, canEditDocs, canExecuteSQL, canEditHistory])
+                               canEditUsersData, canEditDocs, canExecuteSQL, canEditHistory, userId])
         else:
             resp = DB.execute(SQLUser.updateUserById,
                               [givenName, familyName, middleName, email, tel, avatarUrl, userId])
