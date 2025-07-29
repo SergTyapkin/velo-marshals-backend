@@ -21,6 +21,7 @@ services:
       - DB_NAME=${POSTGRES_DB}
       - MAIL_PASSWORD
       - TG_BOT_TOKEN
+      - TG_BOT_ENABLED
     restart: unless-stopped
     volumes:
       - ../.env:/app/.env:r
