@@ -1,7 +1,12 @@
 from dataclasses import dataclass
 from threading import Thread
+import json
 
 import telebot
+
+from src.connections import config
+from src.database.databaseUtils import createSecretCode
+
 
 @dataclass
 class TgBotMessageTexts:
@@ -38,12 +43,34 @@ class TgBotClass:
 
             @self.bot.message_handler(commands=['start'])
             def startHandler(message):
-                print(f"TgBot get start command from #{message.from_user.id}. Response with default text")
-                self.bot.send_message(
-                    message.from_user.id,
-                    "📝 Этот бот будет присылать уведомления о действиях на сайте.\n\nСкорее переходите на сайт и регистрируйтесь на велофестиваль!",
-                    reply_markup=markupWithLinkButton
-                )
+                deepLinkText = message.text.split()[1] if len(message.text.split()) > 1 else None
+                print(f"TgBot get start command from #{message.from_user.id}, text: \"{message.text}\". Response with default text")
+                if deepLinkText == 'auth_by_code':  # Generate enter by code auth link
+                    secretCode = createSecretCode(message.from_user.id, "auth", json.dumps({
+                        'id': message.from_user.id,
+                        'first_name': message.from_user.first_name,
+                        'last_name': message.from_user.last_name,
+                        'username': message.from_user.username,
+                    }))
+                    print(f"TgBot generates auth by code. Code = {secretCode}")
+                    markup = telebot.types.InlineKeyboardMarkup()
+                    btnEnter = telebot.types.InlineKeyboardButton(
+                        text='Войти на сайте',
+                        url=f'https://marshals.ssu-it-dep.bmstu.ru/login?code={secretCode}'
+                    )
+                    markup.add(btnEnter)
+                    self.bot.send_message(
+                        message.from_user.id,
+                        "🔒 Нажмите на кнопку ниже для входа в профиль\n<i>Кнопка одноразовая и работает ровно час</i>",
+                        parse_mode='html',
+                        reply_markup=markup
+                    )
+                else:
+                    self.bot.send_message(
+                        message.from_user.id,
+                        "📝 Этот бот будет присылать уведомления о действиях на сайте.\n\nСкорее переходите на сайт и регистрируйтесь на велофестиваль!",
+                        reply_markup=markupWithLinkButton
+                    )
 
             @self.bot.message_handler()
             def anyMessageHandler(message):
@@ -73,3 +100,6 @@ class TgBotClass:
         if not self.is_enabled:
             return
         self.bot.polling(none_stop=True, interval=0)
+
+
+TgBot = TgBotClass(config)

@@ -1,7 +1,6 @@
 from flask import Blueprint
 
-from src.TgBot.TgBot import TgBotMessageTexts
-from src.connections import TgBot
+from src.TgBot.TgBot import TgBotMessageTexts, TgBot
 from src.utils.access import *
 from src.utils.utils import *
 from src.database.databaseUtils import insertHistory
@@ -61,6 +60,9 @@ def registerToEvent(userData):
 
     if (not eventData['isinfuture']) and (not userData['caneditregistrations']):
         return jsonResponse("Событие уже закончилось, а вы - не админ", HTTP_DATA_CONFLICT)
+
+    if (not eventData['isregistrationopened']) and (not userData['caneditregistrations']):
+        return jsonResponse("Регистрация на событие закрыта, а вы - не админ", HTTP_DATA_CONFLICT)
 
     fullUserData = DB.execute(SQLUser.selectUserById, [userId])
     try:

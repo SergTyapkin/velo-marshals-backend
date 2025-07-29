@@ -1,5 +1,4 @@
 import json
-import random
 import uuid
 
 from flask import Blueprint
@@ -10,7 +9,7 @@ from src.utils.access import *
 from src.constants import *
 from src.utils.detectGeoPositionUtils import detectGeoLocation
 from src.utils.utils import *
-from src.database.databaseUtils import insertHistory
+from src.database.databaseUtils import insertHistory, createSecretCode
 
 from src.database.SQLRequests import user as SQLUser
 from src.database.SQLRequests import events as SQLEvents
@@ -53,26 +52,6 @@ def new_session(resp, browser, osName, geolocation, ip):
     return res
 
 
-def new_secret_code(userId, type, hours=1):
-    DB.execute(SQLUser.deleteExpiredSecretCodes)
-
-    secretCode = DB.execute(SQLUser.selectSecretCodeByUserIdType, [userId, type])
-    if secretCode:
-        code = secretCode['code']
-        return code
-
-    # create new
-    if type == "login":
-        random.seed()
-        code = str(random.randint(1, 999999)).zfill(6)
-    else:
-        code = str(uuid.uuid4())
-
-    DB.execute(SQLUser.insertSecretCode, [userId, code, type, hours])
-
-    return code
-
-
 @app.route("/auth", methods=["POST"])
 def userAuth():
     try:
@@ -104,6 +83,39 @@ def userAuth():
 
     # Update tg user data
     DB.execute(SQLUser.updateUserTgDataById, [str(tgId), tgUsername, tgPhotoUrl, resp['id']])
+
+    return new_session(resp, clientBrowser, clientOS, detectGeoLocation(), request.environ['IP_ADDRESS'])
+
+@app.route("/auth/code", methods=["POST"])
+def userAuthByCode():
+    try:
+        req = request.json
+        secretCode = req['code']
+        clientBrowser = req.get('clientBrowser') or 'Unknown browser'
+        clientOS = req.get('clientOS') or 'Unknown OS'
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
+
+    resp = DB.execute(SQLUser.selectSecretCodeByCode, [secretCode])
+    if not resp:
+        return jsonResponse("Неверный одноразовый код", HTTP_INVALID_AUTH_DATA)
+    DB.execute(SQLUser.deleteSecretCodeByUseridCode, [resp['userid'], resp['code']])
+
+    tgUserData = json.loads(resp['meta'])
+
+    resp = DB.execute(SQLUser.selectUserIdByTgUsernameOrTgId, [tgUserData['username'], str(tgUserData['id'])])
+    if not resp:
+        return jsonResponse("Пользователь еще не зарегистрирован", HTTP_NOT_FOUND)
+
+
+    insertHistory(
+        resp['id'],
+        'account',
+        'Login'
+    )
+
+    # Update tg user data
+    DB.execute(SQLUser.updateUserTgDataWithoutAvatarUrlById, [str(tgUserData['id']), tgUserData['username'], resp['id']])
 
     return new_session(resp, clientBrowser, clientOS, detectGeoLocation(), request.environ['IP_ADDRESS'])
 
@@ -350,7 +362,7 @@ def userConfirmEmailSendMessage(userData):
     if not userData:
         return jsonResponse("На этот email не зарегистрирован ни один аккаунт", HTTP_NOT_FOUND)
 
-    secretCode = new_secret_code(userData['id'], "email", hours=24)
+    secretCode = createSecretCode(userData['id'], "email", hours=24)
 
     send_email(email,
                f"Подтверждение регистрации на {config['project_name']}",

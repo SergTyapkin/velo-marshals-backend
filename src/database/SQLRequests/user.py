@@ -15,8 +15,8 @@ insertSession = \
     "RETURNING *"
 
 insertSecretCode = \
-    "INSERT INTO secretCodes (userId, code, type, expires) " \
-    "VALUES (%s, %s, %s, NOW() + interval '7 days' * %s)" \
+    "INSERT INTO secretCodes (userId, code, type, meta, expires) " \
+    "VALUES (%s, %s, %s, %s, NOW() + interval '7 days' * %s)" \
     "RETURNING *"
 
 # ----- SELECTS -----
@@ -72,12 +72,24 @@ selectSecretCodeByUserIdType = \
     "type = %s AND " \
     "expires > NOW()"
 
+selectSecretCodeByCode = \
+    "SELECT * FROM secretCodes " \
+    "WHERE code = %s AND " \
+    "expires > NOW()"
+
 # ----- UPDATES -----
 updateUserTgDataById = \
     "UPDATE users SET " \
     "tgId = %s, " \
     "tgUsername = %s, " \
     "avatarUrl = %s " \
+    "WHERE id = %s " \
+    "RETURNING *"
+
+updateUserTgDataWithoutAvatarUrlById = \
+    "UPDATE users SET " \
+    "tgId = %s, " \
+    "tgUsername = %s " \
     "WHERE id = %s " \
     "RETURNING *"
 

@@ -35,9 +35,10 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 CREATE TABLE IF NOT EXISTS secretCodes (
     id             SERIAL PRIMARY KEY,
-    userId         INT REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    userId         INT NOT NULL,
     code           TEXT NOT NULL UNIQUE,
     type           TEXT NOT NULL,
+    meta           TEXT DEFAULT NULL,
     expires        TIMESTAMP WITH TIME ZONE NOT NULL,
     UNIQUE (userId, type)
 );
