@@ -99,7 +99,7 @@ def userAuthByCode():
     resp = DB.execute(SQLUser.selectSecretCodeByCode, [secretCode])
     if not resp:
         return jsonResponse("Неверный одноразовый код", HTTP_INVALID_AUTH_DATA)
-    # DB.execute(SQLUser.deleteSecretCodeByUseridCode, [resp['userid'], resp['code']])
+    DB.execute(SQLUser.deleteSecretCodeByUseridCode, [resp['userid'], resp['code']])
 
     tgUserData = json.loads(resp['meta'])
 
