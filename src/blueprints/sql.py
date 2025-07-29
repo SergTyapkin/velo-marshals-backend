@@ -36,7 +36,13 @@ def executeSQL(userData):
 @app.route("/history")
 @login_and_can_execute_sql_required
 def getSQLHistory(userData):
-    resp = DB.execute(SQLHistory.selectHistory({"type": "sql"}), manyResults=True)
+    try:
+        req = request.args
+        limit = req.get('limit')
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
+
+    resp = DB.execute(SQLHistory.selectHistory(req | {"type": "sql"}), manyResults=True)
     list_times_to_str(resp)
 
     return jsonResponse({"history": resp})

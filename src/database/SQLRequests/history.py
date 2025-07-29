@@ -11,6 +11,7 @@ def selectHistory(filters):
     search = filters.get('search')
     dateStart = filters.get('dateStart')
     dateEnd = filters.get('dateEnd')
+    limit = filters.get('limit')
 
     return "SELECT * FROM history " \
         "WHERE " + \
@@ -20,8 +21,8 @@ def selectHistory(filters):
         (f"LOWER(type) LIKE '%%{type.lower()}%%' AND " if type is not None else "") + \
         (f"LOWER(text) LIKE '%%{search.lower()}%%' AND " if search is not None else "") + \
         "1 = 1 " \
-        "ORDER BY date"
-
+        "ORDER BY date " + \
+        (f"LIMIT {limit} " if limit is not None else "")
 # ------------------
 
 deleteHistoryById = \
