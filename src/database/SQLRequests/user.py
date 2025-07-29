@@ -24,11 +24,6 @@ selectUserIdByTgId = \
     f"SELECT id FROM users " \
     "WHERE tgId = %s"
 
-selectUserIdByTgUsernameOrTgId = \
-    f"SELECT id FROM users " \
-    "WHERE LOWER(tgUsername) = LOWER(%s) OR " \
-    "tgId = %s"
-
 selectUserByTgUsernameOrTgId = \
     f"SELECT * FROM users " \
     "WHERE LOWER(tgUsername) = LOWER(%s) OR " \
@@ -77,9 +72,10 @@ selectSecretCodeByUserIdType = \
     "type = %s AND " \
     "expires > NOW()"
 
-selectSecretCodeByCode = \
+selectSecretCodeByCodeType = \
     "SELECT * FROM secretCodes " \
     "WHERE code = %s AND " \
+    "type = %s AND " \
     "expires > NOW()"
 
 # ----- UPDATES -----

@@ -52,8 +52,41 @@ def new_session(resp, browser, osName, geolocation, ip):
     return res
 
 
+def authOrRegisterUserByUserData(userData, tgId, tgUsername, tgUserLastname, tgUserFirstname, tgPhotourl, clientBrowser, clientOS):
+    if not userData or not userData['tel']:  # No user or not full data
+        if not userData:
+            # Register new user
+            try:
+                userData = DB.execute(SQLUser.insertUser,
+                                      [tgId, tgUsername, tgPhotourl, None, None, tgUserLastname, tgUserFirstname, None])
+            except:
+                return jsonResponse("Не удалось создать аккаунт без данных. Внутренняя ошибка", HTTP_INTERNAL_ERROR)
+        # not full data
+
+        insertHistory(
+            userData['id'],
+            'account',
+            f'Create partial account: @{tgUsername} #{tgId}, {tgUserFirstname} {tgUserLastname}, avatarUrl={tgPhotourl}'
+        )
+        return new_session(userData, clientBrowser, clientOS, detectGeoLocation(), request.environ['IP_ADDRESS'])
+
+    insertHistory(
+        userData['id'],
+        'account',
+        'Login existing account'
+    )
+
+    # Update tg user data to actual
+    if tgPhotourl is None:
+        DB.execute(SQLUser.updateUserTgDataWithoutAvatarUrlById, [str(tgId), tgUsername, userData['id']])
+    else:
+        DB.execute(SQLUser.updateUserTgDataById, [str(tgId), tgUsername, tgPhotourl, userData['id']])
+
+    return new_session(userData, clientBrowser, clientOS, detectGeoLocation(), request.environ['IP_ADDRESS'])
+
+
 @app.route("/auth", methods=["POST"])
-def userAuth():
+def userAuthOrRegister():
     try:
         req = request.json
         tgId = req['tgId']
@@ -71,23 +104,14 @@ def userAuth():
     if not check_tg_auth_hash(tgId, tgFirstName, tgLastName, tgUsername, tgPhotoUrl, tgAuthDate, tgHash):
         return jsonResponse("Хэш авторизации TG не совпадает с данными", HTTP_INVALID_AUTH_DATA)
 
-    resp = DB.execute(SQLUser.selectUserIdByTgUsernameOrTgId, [tgUsername, str(tgId)])
-    if not resp:
-        return jsonResponse("Пользователь еще не зарегистрирован", HTTP_NOT_FOUND)
-
-    insertHistory(
-        resp['id'],
-        'account',
-        'Login'
+    resp = DB.execute(SQLUser.selectUserByTgUsernameOrTgId, [tgUsername, str(tgId)])
+    return authOrRegisterUserByUserData(
+        resp, tgId, tgUsername, tgLastName, tgFirstName, tgPhotoUrl,
+        clientBrowser, clientOS
     )
 
-    # Update tg user data
-    DB.execute(SQLUser.updateUserTgDataById, [str(tgId), tgUsername, tgPhotoUrl, resp['id']])
-
-    return new_session(resp, clientBrowser, clientOS, detectGeoLocation(), request.environ['IP_ADDRESS'])
-
 @app.route("/auth/code", methods=["POST"])
-def userAuthByCode():
+def userAuthOrRegisterByCode():
     try:
         req = request.json
         secretCode = req['code']
@@ -96,7 +120,7 @@ def userAuthByCode():
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
-    resp = DB.execute(SQLUser.selectSecretCodeByCode, [secretCode])
+    resp = DB.execute(SQLUser.selectSecretCodeByCodeType, [secretCode, 'auth'])
     if not resp:
         return jsonResponse("Неверный одноразовый код", HTTP_INVALID_AUTH_DATA)
     DB.execute(SQLUser.deleteSecretCodeByUseridCode, [resp['userid'], resp['code']])
@@ -104,35 +128,10 @@ def userAuthByCode():
     tgUserData = json.loads(resp['meta'])
 
     resp = DB.execute(SQLUser.selectUserByTgUsernameOrTgId, [tgUserData['username'], str(tgUserData['id'])])
-    print(resp)
-    if not resp or not resp['tel']: # No user or not full data
-        if not resp:
-            # Register new user
-            try:
-                resp = DB.execute(SQLUser.insertUser,
-                                  [tgUserData['id'], tgUserData['username'], None, None, None, tgUserData['last_name'], tgUserData['first_name'], None])
-            except:
-                return jsonResponse("Не удалось создать аккаунт без данных. Внутренняя ошибка", HTTP_INTERNAL_ERROR)
-        # not full data
-
-        insertHistory(
-            resp['id'],
-            'account',
-            f'Create: {json.dumps(req)}'
-        )
-        return jsonResponse(tgUserData, HTTP_TEAPOT)
-
-
-    insertHistory(
-        resp['id'],
-        'account',
-        'Login'
+    return authOrRegisterUserByUserData(
+        resp, tgUserData['id'], tgUserData['username'], tgUserData['last_name'], tgUserData['first_name'], None,
+        clientBrowser, clientOS
     )
-
-    # Update tg user data
-    DB.execute(SQLUser.updateUserTgDataWithoutAvatarUrlById, [str(tgUserData['id']), tgUserData['username'], resp['id']])
-
-    return new_session(resp, clientBrowser, clientOS, detectGeoLocation(), request.environ['IP_ADDRESS'])
 
 
 @app.route("/session", methods=["DELETE"])
@@ -227,50 +226,6 @@ def userGet(userData):
         return jsonResponse("Пользователь не найден", HTTP_NOT_FOUND)
     addEvents(anotherUserData)
     return jsonResponse(anotherUserData)
-
-
-@app.route("", methods=["POST"])
-def userCreate():
-    try:
-        req = request.json
-        tgId = req['tgId']
-        tgUsername = req.get('tgUsername')
-        tgHash = req['tgHash']
-        tgAuthDate = req['tgAuthDate']
-        tgPhotoUrl = req.get('tgPhotoUrl')
-        tgFirstName = req.get('tgFirstName')
-        tgLastName = req.get('tgLastName')
-        email = req['email']
-        tel = req['tel']
-        avatarUrl = req['avatarUrl']
-        familyName = req['familyName']
-        givenName = req['givenName']
-        middleName = req.get('middleName')
-        clientBrowser = req.get('clientBrowser', 'Unknown browser')
-        clientOS = req.get('clientOS', 'Unknown OS')
-    except Exception as err:
-        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
-    email = email.strip().lower()
-    familyName = familyName.strip()
-    givenName = givenName.strip()
-    middleName = middleName.strip()
-
-    if not check_tg_auth_hash(tgId, tgFirstName, tgLastName, tgUsername, tgPhotoUrl, tgAuthDate, tgHash):
-        return jsonResponse("Хэш авторизации TG не совпадает с данными или авторизация была слишком давно", HTTP_INVALID_AUTH_DATA)
-
-    try:
-        resp = DB.execute(SQLUser.insertUser,
-                          [tgId, tgUsername, avatarUrl, email, tel, familyName, givenName, middleName])
-    except:
-        return jsonResponse("TG, телефон или email заняты", HTTP_DATA_CONFLICT)
-
-    insertHistory(
-        resp['id'],
-        'account',
-        f'Create: {json.dumps(req)}'
-    )
-    return new_session(resp, clientBrowser, clientOS, detectGeoLocation(), request.environ['IP_ADDRESS'])
-
 
 @app.route("", methods=["PUT"])
 @login_required

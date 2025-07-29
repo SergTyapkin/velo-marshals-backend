@@ -47,6 +47,11 @@ def home():
     return "Это начальная страница API для сайта веломаршалов, а не сам сайт. Вiйди отсюда!"
 
 
+@app.route('/health')
+def health():
+    return jsonResponse({'health': 'ok'})
+
+
 @app.errorhandler(404)
 def error404(err):
     print(err)

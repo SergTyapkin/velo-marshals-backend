@@ -13,7 +13,7 @@ def insertHistory(userId: str, type: str, text: str):
 def createSecretCode(userId: str, type: str, meta: str = None, hours=1):
     DB.execute(SQLUser.deleteExpiredSecretCodes)
 
-    secretCode = DB.execute(SQLUser.selectSecretCodeByUserIdType, [userId, type])
+    secretCode = DB.execute(SQLUser.selectSecretCodeByUserIdType, [str(userId), type])
     if secretCode:
         code = secretCode['code']
         return code
@@ -25,6 +25,6 @@ def createSecretCode(userId: str, type: str, meta: str = None, hours=1):
     else:
         code = str(uuid.uuid4())
 
-    DB.execute(SQLUser.insertSecretCode, [userId, code, type, meta, hours])
+    DB.execute(SQLUser.insertSecretCode, [str(userId), code, type, meta, hours])
 
     return code

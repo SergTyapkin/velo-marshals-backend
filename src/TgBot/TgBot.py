@@ -41,7 +41,22 @@ class TgBotClass:
             )
             markupWithLinkButton.add(btn1)
 
+            # errors handling decorator
+            def errorsHandling(foo):
+                def handleErrors(message):
+                    try:
+                        return foo(message)
+                    except Exception as e:
+                        print("TgBot: Internal error when handling:", e)
+                        self.bot.send_message(
+                            message.from_user.id,
+                            f"❗❗❗ Внутренняя ошибка сервера при обработке сообщения: {e} ❗❗❗",
+                        )
+                        return
+                return handleErrors
+
             @self.bot.message_handler(commands=['start'])
+            @errorsHandling
             def startHandler(message):
                 deepLinkText = message.text.split()[1] if len(message.text.split()) > 1 else None
                 print(f"TgBot get start command from #{message.from_user.id}, text: \"{message.text}\". Response with default text")
@@ -73,6 +88,7 @@ class TgBotClass:
                     )
 
             @self.bot.message_handler()
+            @errorsHandling
             def anyMessageHandler(message):
                 print(f"TgBot get message from #{message.from_user.id}:", message.text, ". Response with default text")
                 self.bot.send_message(

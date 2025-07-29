@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 CREATE TABLE IF NOT EXISTS secretCodes (
     id             SERIAL PRIMARY KEY,
-    userId         INT NOT NULL,
+    userId         TEXT NOT NULL,
     code           TEXT NOT NULL UNIQUE,
     type           TEXT NOT NULL,
     meta           TEXT DEFAULT NULL,
