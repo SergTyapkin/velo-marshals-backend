@@ -62,8 +62,9 @@ def registerToEvent(userData):
     if (not eventData['isinfuture']) and (not userData['caneditregistrations']):
         return jsonResponse("Событие уже закончилось, а вы - не админ", HTTP_DATA_CONFLICT)
 
+    fullUserData = DB.execute(SQLUser.selectUserById, [userId])
     try:
-        response = DB.execute(SQLEvents.insertRegistration, [eventId, userId, userComment])
+        response = DB.execute(SQLEvents.insertRegistration, [eventId, userId, userComment, fullUserData['level']])
     except:
         return jsonResponse("Пользователь уже записан на это мероприятие", HTTP_DATA_CONFLICT)
 
