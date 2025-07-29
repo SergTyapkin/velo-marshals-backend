@@ -29,6 +29,11 @@ selectUserIdByTgUsernameOrTgId = \
     "WHERE LOWER(tgUsername) = LOWER(%s) OR " \
     "tgId = %s"
 
+selectUserByTgUsernameOrTgId = \
+    f"SELECT * FROM users " \
+    "WHERE LOWER(tgUsername) = LOWER(%s) OR " \
+    "tgId = %s"
+
 selectUserById = \
     f"SELECT * FROM users " \
     "WHERE id = %s"

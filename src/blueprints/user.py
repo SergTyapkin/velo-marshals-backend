@@ -99,13 +99,28 @@ def userAuthByCode():
     resp = DB.execute(SQLUser.selectSecretCodeByCode, [secretCode])
     if not resp:
         return jsonResponse("Неверный одноразовый код", HTTP_INVALID_AUTH_DATA)
-    DB.execute(SQLUser.deleteSecretCodeByUseridCode, [resp['userid'], resp['code']])
+    # DB.execute(SQLUser.deleteSecretCodeByUseridCode, [resp['userid'], resp['code']])
 
     tgUserData = json.loads(resp['meta'])
 
-    resp = DB.execute(SQLUser.selectUserIdByTgUsernameOrTgId, [tgUserData['username'], str(tgUserData['id'])])
-    if not resp:
-        return jsonResponse("Пользователь еще не зарегистрирован", HTTP_NOT_FOUND)
+    resp = DB.execute(SQLUser.selectUserByTgUsernameOrTgId, [tgUserData['username'], str(tgUserData['id'])])
+    print(resp)
+    if not resp or not resp['tel']: # No user or not full data
+        if not resp:
+            # Register new user
+            try:
+                resp = DB.execute(SQLUser.insertUser,
+                                  [tgUserData['id'], tgUserData['username'], None, None, None, tgUserData['last_name'], tgUserData['first_name'], None])
+            except:
+                return jsonResponse("Не удалось создать аккаунт без данных. Внутренняя ошибка", HTTP_INTERNAL_ERROR)
+        # not full data
+
+        insertHistory(
+            resp['id'],
+            'account',
+            f'Create: {json.dumps(req)}'
+        )
+        return jsonResponse(tgUserData, HTTP_TEAPOT)
 
 
     insertHistory(
