@@ -46,3 +46,16 @@ def getSQLHistory(userData):
     list_times_to_str(resp)
 
     return jsonResponse({"history": resp})
+
+@app.route("/history", methods=["DELETE"])
+@login_and_can_execute_sql_required
+def getSQLHistory(userData):
+    try:
+        req = request.json
+        id = req["id"]
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
+
+    DB.execute(SQLHistory.deleteHistoryById, [id])
+
+    return jsonResponse("Запись истории удалена")

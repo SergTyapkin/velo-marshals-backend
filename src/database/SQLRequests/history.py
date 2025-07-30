@@ -21,7 +21,7 @@ def selectHistory(filters):
         (f"LOWER(type) LIKE '%%{type.lower()}%%' AND " if type is not None else "") + \
         (f"LOWER(text) LIKE '%%{search.lower()}%%' AND " if search is not None else "") + \
         "1 = 1 " \
-        "ORDER BY date " + \
+        "ORDER BY date DESC " + \
         (f"LIMIT {limit} " if limit is not None else "")
 # ------------------
 
