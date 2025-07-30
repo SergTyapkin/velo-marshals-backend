@@ -16,7 +16,7 @@ from src.blueprints.docs import app as docs_app
 from src.blueprints.image import app as image_app
 from src.blueprints.achievements import app as achievements_app
 from src.connections import config
-from src.constants import HTTP_NOT_FOUND, HTTP_INTERNAL_ERROR
+from src.constants import HTTP_NOT_FOUND, HTTP_INTERNAL_ERROR, MAX_LOG_DATA_LENGTH
 from src.middleware import Middleware
 from src.utils.utils import jsonResponse
 
@@ -71,7 +71,7 @@ def start_timer():
 @app.after_request
 def log_request(response):
     now = time.time()
-    duration = round(now - g.start, 2)
+    duration = round((now - g.start) * 1000, 2)
     dt = datetime.datetime.fromtimestamp(now)
     timestamp = rfc3339(dt, utc=True)
 
@@ -85,18 +85,20 @@ def log_request(response):
     except:
         pass
 
+    responseText = response.get_data().decode()
+
     log_params = [
         (timestamp, purple),
         (request.method, blue),
         (request.path, blue),
         (response.status_code, yellow),
-        (f'duration={duration}s', green),
+        (f'duration={duration}ms', green),
         (f'ip={ip}', red),
         (f'host={host}', red),
         (f'query={args}', blue),
         (f'body={json}', cyan),
         (f'RES_code={response.status_code}', light_gray),
-        (f'RES_data={response.get_data().decode()}', light_gray),
+        (f'RES_data={responseText[:MAX_LOG_DATA_LENGTH] + ("... ({len(responseText)} symbols total)" if len(responseText) > MAX_LOG_DATA_LENGTH else "")}', light_gray),
     ]
 
     request_id = request.headers.get('X-Request-ID')

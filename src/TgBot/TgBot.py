@@ -47,11 +47,14 @@ class TgBotClass:
                     try:
                         return foo(message)
                     except Exception as e:
-                        print("TgBot: Internal error when handling:", e)
-                        self.bot.send_message(
-                            message.from_user.id,
-                            f"❗❗❗ Внутренняя ошибка сервера при обработке сообщения: {e} ❗❗❗",
-                        )
+                        print("[TgBot] Internal error when handling:", e)
+                        try:
+                            self.bot.send_message(
+                                message.from_user.id,
+                                f"❗❗❗ Внутренняя ошибка сервера при обработке сообщения: {e} ❗❗❗",
+                            )
+                        except Exception as e:
+                            print("[TgBot] Cannot send error message to client!", e)
                         return
                 return handleErrors
 
@@ -97,25 +100,28 @@ class TgBotClass:
                     reply_markup=markupWithLinkButton
                 )
 
-            print("TgBot successfully initialized")
+            print("[TgBot] successfully initialized")
         except:
-            print("TgBot: Cannot connect to Telegram Bot.")
+            print("[TgBot] Cannot connect to Telegram Bot.")
 
         self.thread = Thread(target=self.startBotPolling, args=[self], daemon=True)
         self.thread.start()
 
     def sendMessage(self, userTgId: str, MessageText: str, *values: list[str]):
         if not self.is_enabled:
-            print("TgBot not enabled in config")
+            print("[TgBot] TgBot not enabled in config")
             return
         message = MessageText % values
-        print(f"TgBot send message to #{userTgId}:", message)
+        print(f"[TgBot] send message to #{userTgId}:", message)
         self.bot.send_message(userTgId, message)
 
     def startBotPolling(self):
         if not self.is_enabled:
             return
-        self.bot.polling(none_stop=True, interval=0)
+        try:
+            self.bot.polling(none_stop=True, interval=0)
+        except Exception as e:
+            print(f"[TgBot] Error in polling cycle:", e)
 
 
 TgBot = TgBotClass(config)
