@@ -4,22 +4,21 @@
 info:
 	echo "------------------------------------------------------------------------------------------------------" && \
 	echo "| You runs make command with no targets. You must specify target after 'make'. For example 'make all' |" && \
-	echo "| Available targets: all; update; build; run; down; setup-ci; install-docker-if-not-exists; set-docker-not-sudo; setup-env-file." && \
+	echo "| Available targets: all; update; build; run; down; logs; make-dirs; setup-ci; install-docker-if-not-exists; set-docker-not-sudo; setup-env-file." && \
 	echo "------------------------------------------------------------------------------------------------------"
 
 build:
 	echo "[Make]: Running 'build' target in Makefile..." && \
-    cd docker-deploy && \
-    docker compose --env-file ../.env --progress=plain build
+  bash ./docker-deploy/scripts/build.sh
 run:
 	echo "[Make]: Running 'run' target in Makefile..." && \
-    cd docker-deploy && \
-    docker compose --env-file ../.env down && \
-    docker compose --env-file ../.env up -d
+	bash ./docker-deploy/scripts/run.sh
 down:
 	echo "[Make]: Running 'down' target in Makefile..." && \
-    cd docker-deploy && \
-    docker compose --env-file ../.env down
+  bash ./docker-deploy/scripts/down.sh
+logs:
+	echo "[Make]: Running 'logs' target in Makefile..." && \
+  bash ./docker-deploy/scripts/logs.sh
 
 
 update:
