@@ -16,26 +16,29 @@ MAIL_HTML = """<html>
     <h1>Ура, новый бэкап!</h1>
   </body>
 </html>"""
-BACKUPS_DIR = "/pg_backups"
-
+PG_DUMP_FILENAME = f"{datetime.now().strftime('%A')}.sql.backup"
+PG_DUMP_FULLPATH = f"/pg_backups/{PG_DUMP_FILENAME}"
+MAKE_BACKUP_CMD = f"pg_dump -F c -b -U \"backups\" tech-support > {PG_DUMP_FULLPATH}"
 
 if __name__ == '__main__':
+    os.system(MAKE_BACKUP_CMD)  # make backup
+
     WEEKDAY = datetime.today().strftime('%A')
-    FILE_NAME = f"backup_{WEEKDAY}.sql.backup"
-    FILE_PATH = os.path.join(BACKUPS_DIR, FILE_NAME)
+    TIMESTAMP = datetime.today().strftime('%Y%m%d%H%M%S')
+    MAIL_FILE_NAME = f"backup_{WEEKDAY}_{TIMESTAMP}.sql.backup"
 
     msg = MIMEMultipart()
     msg['Subject'] = f"{WEEKDAY}(GMT) Backup of {DB_NAME}"
     msg['From'] = config["mail_sender_name"]
     msg['To'] = MAIL_RECIPIENT
     msg.attach(MIMEText(MAIL_HTML, 'html'))
-    with open(FILE_PATH, "rb") as f:
+    with open(PG_DUMP_FULLPATH, "rb") as f:
         part = MIMEApplication(
             f.read(),
-            Name=FILE_NAME
+            Name=MAIL_FILE_NAME
         )
     # After the file is closed
-    part['Content-Disposition'] = f'attachment; filename="{FILE_NAME}"'
+    part['Content-Disposition'] = f'attachment; filename="{MAIL_FILE_NAME}"'
     msg.attach(part)
 
     server = smtplib.SMTP(host=config["SMTP_mail_server_host"], port=config["SMTP_mail_server_port"])

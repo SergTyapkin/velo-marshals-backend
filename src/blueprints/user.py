@@ -52,7 +52,8 @@ def new_session(resp, browser, osName, geolocation, ip):
     return res
 
 
-def authOrRegisterUserByUserData(userData, tgId, tgUsername, tgUserLastname, tgUserFirstname, tgPhotourl, clientBrowser, clientOS):
+def authOrRegisterUserByUserData(userData, tgId, tgUsername, tgUserLastname, tgUserFirstname, tgPhotourl, clientBrowser,
+                                 clientOS):
     if not userData or not userData['tel']:  # No user or not full data
         if not userData:
             # Register new user
@@ -109,6 +110,7 @@ def userAuthOrRegister():
         resp, tgId, tgUsername, tgLastName, tgFirstName, tgPhotoUrl,
         clientBrowser, clientOS
     )
+
 
 @app.route("/auth/code", methods=["POST"])
 def userAuthOrRegisterByCode():
@@ -227,6 +229,7 @@ def userGet(userData):
     addEvents(anotherUserData)
     return jsonResponse(anotherUserData)
 
+
 @app.route("", methods=["PUT"])
 @login_required
 def userUpdate(userData):
@@ -324,6 +327,19 @@ def userDelete(userData):
     return jsonResponse("Пользователь удален")
 
 
+@app.route("/all")
+def usersGetAll():
+    try:
+        req = request.args
+        search = req.get('search')
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
+
+    resp = DB.execute(SQLUser.selectUsersByFilters(req), manyResults=True)
+    return jsonResponse({'users': resp})
+
+
+@app.route("/email/confirmation/send", methods=["POST"])
 @login_required
 def userConfirmEmailSendMessage(userData):
     email = userData['email']
@@ -336,8 +352,7 @@ def userConfirmEmailSendMessage(userData):
 
     send_email(email,
                f"Подтверждение регистрации на {config['project_name']}",
-               emails.confirmEmail(f"/image/{userData['avatarUrl']}",
-                                   userData['givenname'] + ' ' + userData['familyname'], secretCode))
+               emails.confirmEmail(userData['avatarurl'], userData['givenname'] + ' ' + userData['familyname'], secretCode))
 
     insertHistory(
         userData['id'],
@@ -347,7 +362,7 @@ def userConfirmEmailSendMessage(userData):
     return jsonResponse("Ссылка для подтверждения email выслана на почту " + email)
 
 
-@app.route("/email/confirm", methods=["PUT"])
+@app.route("/email/confirmation", methods=["POST"])
 def userConfirmEmail():
     try:
         req = request.json
@@ -359,21 +374,11 @@ def userConfirmEmail():
     if not resp:
         return jsonResponse("Неверный одноразовый код", HTTP_INVALID_AUTH_DATA)
 
+    DB.execute(SQLUser.deleteSecretCodeByCodeType, [code, "email"])
+
     insertHistory(
         resp['id'],
         'account',
         f'Email confirmed'
     )
     return jsonResponse("Адрес email подтвержден")
-
-
-@app.route("/all")
-def usersGetAll():
-    try:
-        req = request.args
-        search = req.get('search')
-    except Exception as err:
-        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
-
-    resp = DB.execute(SQLUser.selectUsersByFilters(req), manyResults=True)
-    return jsonResponse({'users': resp})

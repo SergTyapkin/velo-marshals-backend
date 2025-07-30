@@ -27,7 +27,7 @@
     "SMTP_mail_server_host": "smtp.googlemail.com",
     "SMTP_mail_server_port": 587,
     "SMTP_mail_server_use_tls": true,
-    "mail_address": "velo.marshal@gmail.com",
+    "mail_address": "velomarshal@gmail.com",
     "mail_sender_name": "VeloMarshal",
 
     "geolite_db_path": "configs/GeoLite2-City.mmdb"

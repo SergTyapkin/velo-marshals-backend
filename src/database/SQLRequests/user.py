@@ -131,7 +131,7 @@ updateUserConfirmationBySecretcodeType = \
     "UPDATE users " \
     "SET isConfirmedEmail = True " \
     "FROM secretCodes " \
-    "WHERE secretCodes.userId = users.id AND " \
+    "WHERE secretCodes.userId = CAST(users.id as TEXT) AND " \
     "secretCodes.code = %s AND " \
     "secretCodes.type = %s " \
     "RETURNING users.*"
@@ -162,3 +162,8 @@ deleteSecretCodeByUseridCode = \
     "DELETE FROM secretCodes " \
     "WHERE userId = %s AND " \
     "code = %s"
+
+deleteSecretCodeByCodeType = \
+    "DELETE FROM secretCodes " \
+    "WHERE code = %s AND " \
+    "type = %s"
