@@ -98,7 +98,8 @@ def log_request(response):
         (f'query={args}', blue),
         (f'body={json}', cyan),
         (f'RES_code={response.status_code}', light_gray),
-        (f'RES_data={responseText[:MAX_LOG_DATA_LENGTH] + ("... ({len(responseText)} symbols total)" if len(responseText) > MAX_LOG_DATA_LENGTH else "")}', light_gray),
+        (f'RES_data={responseText[:MAX_LOG_DATA_LENGTH] + (f"... ({len(responseText)} symbols total)" if len(responseText) > MAX_LOG_DATA_LENGTH else "")}', light_gray),
+        (f'\n', light_gray),
     ]
 
     request_id = request.headers.get('X-Request-ID')
