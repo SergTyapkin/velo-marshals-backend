@@ -136,6 +136,12 @@ updateUserConfirmationBySecretcodeType = \
     "secretCodes.type = %s " \
     "RETURNING users.*"
 
+updateUserRevokeEmailConfirmationByUserId = \
+    "UPDATE users " \
+    "SET isConfirmedEmail = False " \
+    "WHERE id = %s " \
+    "RETURNING *"
+
 # ----- DELETES -----
 deleteExpiredSessions = \
     "DELETE FROM sessions " \

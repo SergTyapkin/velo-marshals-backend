@@ -267,6 +267,8 @@ def userUpdate(userData):
     if familyName: familyName = familyName.strip()
     if middleName: middleName = middleName.strip()
 
+    isEmailChanged = email != userData['email']
+
     givenName = givenName or userData['givenname']
     familyName = familyName or userData['familyname']
     middleName = middleName or userData['middlename']
@@ -294,6 +296,8 @@ def userUpdate(userData):
         else:
             resp = DB.execute(SQLUser.updateUserById,
                               [givenName, familyName, middleName, email, tel, avatarUrl, userId])
+            if isEmailChanged:
+                DB.execute(SQLUser.updateUserRevokeEmailConfirmationByUserId, [userId])
     except:
         return jsonResponse("Имя пользователя или email заняты", HTTP_DATA_CONFLICT)
 
