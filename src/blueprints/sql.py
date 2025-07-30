@@ -49,7 +49,7 @@ def getSQLHistory(userData):
 
 @app.route("/history", methods=["DELETE"])
 @login_and_can_execute_sql_required
-def getSQLHistory(userData):
+def deleteSQLHistory(userData):
     try:
         req = request.json
         id = req["id"]
