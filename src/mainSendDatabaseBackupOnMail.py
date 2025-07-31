@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # os.system(MAKE_BACKUP_CMD)  # make backup
 
     WEEKDAY = datetime.today().strftime('%A')
-    TIMESTAMP = datetime.today().strftime('%Y%m%d%H%M%S')
+    TIMESTAMP = datetime.today().strftime('%d.%m.%Y-%H:%M:%S')
     PG_DUMP_FILENAME = f"backup_{WEEKDAY}.sql.backup"
     PG_DUMP_FULLPATH = f"./pg_backups/{PG_DUMP_FILENAME}"
     MAIL_FILE_NAME = f"backup_{WEEKDAY}_{TIMESTAMP}.sql.backup"
