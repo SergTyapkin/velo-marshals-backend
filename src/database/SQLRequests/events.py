@@ -55,19 +55,19 @@ selectRegistrationByUseridEventid = \
     "eventid = %s"
 
 selectRegistrationsByEventid = \
-    "SELECT registrations.*, (users.givenName  || ' ' || users.familyName) as username, users.avatarUrl useravatarurl, users.tel usertel, users.tgUsername usertgusername, users.level as userlevel FROM registrations " \
+    "SELECT registrations.*, users.familyName as userFamilyName, users.givenName as userGivenName, users.middleName as userMiddleName, users.avatarUrl useravatarurl, users.tel usertel, users.tgUsername usertgusername, users.level as userlevel FROM registrations " \
     "JOIN users ON registrations.userid = users.id " \
     "WHERE eventid = %s " \
     "ORDER BY registrations.id"
 
 selectRegistrationsUnconfirmedByEventid = \
-    "SELECT registrations.*, (users.givenName  || ' ' || users.familyName) as username, users.avatarUrl useravatarurl, users.tel usertel, users.tgUsername usertgusername, users.level as userlevel FROM registrations " \
+    "SELECT registrations.*, users.familyName as userFamilyName, users.givenName as userGivenName, users.middleName as userMiddleName, users.avatarUrl useravatarurl, users.tel usertel, users.tgUsername usertgusername, users.level as userlevel FROM registrations " \
     "JOIN users ON registrations.userid = users.id " \
     "WHERE eventid = %s " \
     "ORDER BY registrations.id"
 
 selectRegistrationsByUserId = \
-    "SELECT registrations.*, (users.givenName  || ' ' || users.familyName) as username, users.avatarUrl useravatarurl, users.tel usertel, users.tgUsername usertgusername, users.level as userlevel, events.medalPreviewUrl as eventmedalpreviewurl, events.id as eventid, events.title as eventtitle FROM registrations " \
+    "SELECT registrations.*, users.familyName as userFamilyName, users.givenName as userGivenName, users.middleName as userMiddleName, users.avatarUrl useravatarurl, users.tel usertel, users.tgUsername usertgusername, users.level as userlevel, events.medalPreviewUrl as eventmedalpreviewurl, events.id as eventid, events.title as eventtitle FROM registrations " \
     "JOIN users ON registrations.userid = users.id " \
     "JOIN events on registrations.eventid = events.id " \
     "WHERE userid = %s " \
