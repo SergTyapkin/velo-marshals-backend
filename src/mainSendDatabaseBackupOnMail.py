@@ -17,7 +17,7 @@ MAIL_HTML = """<html>
   </body>
 </html>"""
 PG_DUMP_FILENAME = f"{datetime.now().strftime('%A')}.sql.backup"
-PG_DUMP_FULLPATH = f"/pg_backups/{PG_DUMP_FILENAME}"
+PG_DUMP_FULLPATH = f"./pg_backups/{PG_DUMP_FILENAME}"
 MAKE_BACKUP_CMD = f"pg_dump -F c -b -U \"backups\" tech-support > {PG_DUMP_FULLPATH}"
 
 if __name__ == '__main__':

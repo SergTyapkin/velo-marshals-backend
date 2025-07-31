@@ -26,6 +26,7 @@ services:
     volumes:
       - ../.env:/app/.env:r
       - ./images_data:/app/images:rwo
+      - ./pg_backups:/app/pg_backups:rwo
     depends_on:
       db:
         condition: service_healthy
