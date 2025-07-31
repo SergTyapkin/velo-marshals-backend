@@ -293,6 +293,8 @@ def userUpdate(userData):
                               [givenName, familyName, middleName, email, tel, avatarUrl, level, tgUsername,
                                tgId, canEditAchievements, canAssignAchievements, canEditRegistrations, canEditEvents,
                                canEditUsersData, canEditDocs, canExecuteSQL, canEditHistory, userId])
+            if isEmailChanged:
+                DB.execute(SQLUser.updateUserRevokeEmailConfirmationByUserId, [userId])
         else:
             resp = DB.execute(SQLUser.updateUserById,
                               [givenName, familyName, middleName, email, tel, avatarUrl, userId])
