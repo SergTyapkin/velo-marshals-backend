@@ -26,7 +26,7 @@ services:
     volumes:
       - ../.env:/app/.env:r
       - ./images_data:/app/images:rwo
-      - ./pg_backups:/app/pg_backups:rwo
+      - ./pg_backups:/app/pg_backups:r
     depends_on:
       db:
         condition: service_healthy
@@ -53,6 +53,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./pg_data:/var/lib/postgresql/data:rwo
+      - ./pg_backups:/pg_backups:w
     networks:
        - backend-internal
 
