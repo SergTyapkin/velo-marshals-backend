@@ -48,8 +48,7 @@ setup-env-file:
 
 backup:
 	@echo "[Make]: Running 'backup' target in Makefile..." && \
-	cd ./docker-deploy && \
-    docker compose exec app python -m src.mainSendDatabaseBackupOnMail
+	bash ./docker-deploy/scripts/backup.sh
 
 all:
 	@echo "[Make]: Running 'all' target in Makefile..." && \
