@@ -30,10 +30,11 @@ def getRegistrationsByEvent(userData):
     try:
         req = request.args
         eventId = req['eventId']
+        isConfirmed = bool(req.get('isConfirmed'))
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
-    resp = DB.execute(SQLEvents.selectRegistrationsByEventid, [eventId], manyResults=True)
+    resp = DB.execute(SQLEvents.selectRegistrationsByEventidIsConfirmed, [eventId, isConfirmed], manyResults=True)
     if resp is None:
         return jsonResponse("Событие не найдено", HTTP_NOT_FOUND)
 

@@ -69,6 +69,13 @@ selectRegistrationsByEventid = \
     "WHERE eventid = %s " \
     "ORDER BY registrations.id"
 
+selectRegistrationsByEventidIsConfirmed = \
+    "SELECT registrations.*, users.familyName as userFamilyName, users.givenName as userGivenName, users.middleName as userMiddleName, users.avatarUrl useravatarurl, users.tel usertel, users.tgUsername usertgusername, users.level as userlevel FROM registrations " \
+    "JOIN users ON registrations.userid = users.id " \
+    "WHERE eventid = %s " \
+    "AND isconfirmed = %s " \
+    "ORDER BY registrations.id"
+
 selectRegistrationsUnconfirmedByEventid = \
     "SELECT registrations.*, users.familyName as userFamilyName, users.givenName as userGivenName, users.middleName as userMiddleName, users.avatarUrl useravatarurl, users.tel usertel, users.tgUsername usertgusername, users.level as userlevel FROM registrations " \
     "JOIN users ON registrations.userid = users.id " \
