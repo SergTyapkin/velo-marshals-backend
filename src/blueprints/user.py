@@ -192,8 +192,6 @@ def userGet(userData):
     try:
         req = request.args
         userId = req.get('id')
-        tgId = req.get('tgId')
-        tgUsername = req.get('tgUsername')
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
@@ -203,19 +201,11 @@ def userGet(userData):
         userData['completedevents'] = completedEvents
 
     def addGlobals(userData):
-        globalEvent = DB.execute(SQLGlobals.selectGlobalEvent) or {}
-        globalRegistration = DB.execute(SQLGlobals.selectGlobalRegistrationByUserId, [userData['id']]) or {}
-        userData['isonmaintenance'] = globalEvent.get('isonmaintenance')
-        userData['globalevent'] = globalEvent
-        userData['globalregistration'] = globalRegistration
-
-    if tgUsername is not None or tgId is not None:  # return user data by tgUsername or tgId
-        user = DB.execute(SQLUser.selectUserIdByTgUsernameOrTgId, [tgUsername, str(tgId)])
-        if not user:
-            return jsonResponse("Пользователя с таким tgUsername или tgId не существует", HTTP_NOT_FOUND)
-        addEvents(user)
-        addGlobals(user)
-        return jsonResponse(user)
+        globalEvent = DB.execute(SQLGlobals.selectGlobalEvent)
+        globalRegistration = DB.execute(SQLGlobals.selectGlobalRegistrationByUserId, [userData['id']])
+        userData['isonmaintenance'] = bool(globalEvent.get('isonmaintenance'))
+        userData['globalevent'] = None if not globalEvent else globalEvent
+        userData['globalregistration'] = None if not globalRegistration else globalRegistration
 
     if userId is None:  # return self user data
         if userData is None:
