@@ -9,6 +9,21 @@ from src.database.SQLRequests import equipment as SQLEquipment
 app = Blueprint('equipment', __name__)
 
 
+@app.route("")
+@login_required_return_id
+def equipmentGetSingle(userId):
+    try:
+        req = request.args
+        id = req['id']
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
+
+    equipment = DB.execute(SQLEquipment.selectEquipmentById, [id])
+    if not equipment:
+        return jsonResponse("Такого оборудования не найдено", HTTP_NOT_FOUND)
+    return jsonResponse(equipment)
+
+
 @app.route("/event/groups")
 @login_required_return_id
 def equipmentGroupsGet(userId):
@@ -116,6 +131,31 @@ def equipmentDelete(userData):
     return jsonResponse("Оборудование удалено")
 
 
+@app.route("/take", methods=["POST"])
+@login_required_return_id
+def equipmentTakeFromAnother(userId):
+    try:
+        req = request.json
+        id = req['id']
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
+
+    equipment = DB.execute(SQLEquipment.selectEquipmentById, [id])
+    if not equipment:
+        return jsonResponse("Не известное id оборудования", HTTP_NOT_FOUND)
+
+    DB.execute(SQLEquipment.deleteUserEquipmentByEquipmentId, [id])
+    DB.execute(SQLEquipment.insertUserEquipment, [userId, id, equipment['amounttotal']])
+
+    insertHistory(
+        userId,
+        'equipment',
+        f'Take equipment from another user. Equipment: #{id} {equipment["title"]}'
+    )
+
+    return jsonResponse("Оборудование записано")
+
+
 @app.route("/event/holders", methods=["GET"])
 @login_required
 def equipmentHoldersGet(userData):
@@ -172,6 +212,13 @@ def addEquipmentToUser(userData):
 
     if userId != userData['id'] and not userData['caneditevents']:
         return jsonResponse("Нет прав доступа на запись оборудования на другого пользователя", HTTP_NOT_FOUND)
+
+    equipment = DB.execute(SQLEquipment.selectEquipmentWithAmountLeftById, [equipmentId])
+    if not equipment:
+        return jsonResponse("Оборудование с таким id не найдено", HTTP_NOT_FOUND)
+    if amountAdd > equipment['amountleft']:
+        return jsonResponse("Нельзя записать больше, чем осталось", HTTP_DATA_CONFLICT)
+
     equipment = DB.execute(SQLEquipment.selectUserEquipmentsByUseridEquipmentId, [userId, equipmentId])
     if not equipment:
         equipment = DB.execute(SQLEquipment.insertUserEquipment, [userId, equipmentId, amountAdd])

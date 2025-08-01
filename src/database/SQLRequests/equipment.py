@@ -28,6 +28,12 @@ selectEquipmentsByEventId = \
     "WHERE equipment.eventId = %s " \
     "GROUP BY equipment.id"
 
+selectEquipmentWithAmountLeftById = \
+    "SELECT equipment.*, amountTotal - COALESCE(SUM(ue.amountHolds), 0) as amountLeft FROM equipment " \
+    "LEFT JOIN usersEquipments ue ON ue.equipmentId = equipment.id " \
+    "WHERE equipment.id = %s " \
+    "GROUP BY equipment.id"
+
 selectEquipmentUsersHoldersByEquipmentIdEventId = \
     "SELECT users.id, (users.givenName  || ' ' || users.familyName) as username, users.avatarUrl FROM usersEquipments " \
     "LEFT JOIN users ON usersEquipments.userId = users.id " \
@@ -70,6 +76,10 @@ deleteEquipmentById = \
 deleteUserEquipmentById = \
     "DELETE FROM usersequipments " \
     "WHERE id = %s"
+
+deleteUserEquipmentByEquipmentId = \
+    "DELETE FROM usersequipments " \
+    "WHERE equipmentId = %s"
 
 deleteUserEquipmentByUseridEquipmentId = \
     "DELETE FROM usersequipments " \
