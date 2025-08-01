@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS events (
     id                   SERIAL PRIMARY KEY,
     title                TEXT NOT NULL DEFAULT '',
     description          TEXT NOT NULL DEFAULT '',
+    fullDescription      TEXT NOT NULL DEFAULT '',
     routeDescription     TEXT NOT NULL DEFAULT '',
     createdDate          TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     startDate            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NULL,

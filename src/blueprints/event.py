@@ -57,6 +57,7 @@ def eventCreate(userData):
         req = request.json
         title = req['title']
         description = req.get('description')
+        fullDescription = req.get('fullDescription')
         routeDescription = req.get('routeDescription')
         startDate = req['startDate']
         cameDate = req['cameDate']
@@ -67,7 +68,7 @@ def eventCreate(userData):
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
-    event = DB.execute(SQLEvents.insertEvent, [title, description, routeDescription, previewUrl, customCSS, lapDistanceKm, medalPreviewUrl, userData['id'], startDate, cameDate])
+    event = DB.execute(SQLEvents.insertEvent, [title, description, fullDescription, routeDescription, previewUrl, customCSS, lapDistanceKm, medalPreviewUrl, userData['id'], startDate, cameDate])
     times_to_str(event)
 
     insertHistory(
@@ -87,6 +88,7 @@ def eventUpdate(userData):
         id = req['id']
         title = req['title']
         description = req.get('description')
+        fullDescription = req.get('fullDescription')
         routeDescription = req.get('routeDescription')
         startDate = req['startDate']
         cameDate = req['cameDate']
@@ -104,6 +106,7 @@ def eventUpdate(userData):
 
     if title is None: name = eventData['name']
     if description is None: description = eventData['description']
+    if fullDescription is None: fullDescription = eventData['fulldescription']
     if routeDescription is None: routeDescription = eventData['routedescription']
     if startDate is None: startDate = eventData['startdate']
     if cameDate is None: cameDate = eventData['camedate']
@@ -112,7 +115,7 @@ def eventUpdate(userData):
     if lapDistanceKm is None: lapDistanceKm = eventData['lapdistancekm']
     if medalPreviewUrl is None: medalPreviewUrl = eventData['medalpreviewurl']
 
-    event = DB.execute(SQLEvents.updateEventById, [title, description, routeDescription, startDate, cameDate, previewUrl, customCSS, lapDistanceKm, medalPreviewUrl, id])
+    event = DB.execute(SQLEvents.updateEventById, [title, description, fullDescription, routeDescription, startDate, cameDate, previewUrl, customCSS, lapDistanceKm, medalPreviewUrl, id])
     times_to_str(event)
 
     insertHistory(

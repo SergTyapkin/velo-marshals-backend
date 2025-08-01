@@ -1,5 +1,5 @@
 insertEvent = \
-    "INSERT INTO events (title, description, routeDescription, previewUrl, customCSS, lapDistanceKm, medalPreviewUrl, authorId, startDate, cameDate) " \
+    "INSERT INTO events (title, description, fullDescription, routeDescription, previewUrl, customCSS, lapDistanceKm, medalPreviewUrl, authorId, startDate, cameDate) " \
     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) " \
     "RETURNING *"
 
@@ -94,6 +94,7 @@ updateEventById = \
     "UPDATE events SET " \
     "title = %s, " \
     "description = %s, " \
+    "fullDescription = %s, " \
     "routeDescription = %s, " \
     "startDate = %s, " \
     "cameDate = %s, " \
