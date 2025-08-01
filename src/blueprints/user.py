@@ -98,8 +98,8 @@ def userAuthOrRegister():
         tgPhotoUrl = req.get('tgPhotoUrl')
         tgFirstName = req.get('tgFirstName')
         tgLastName = req.get('tgLastName')
-        clientBrowser = req.get('clientBrowser') or 'Unknown browser'
-        clientOS = req.get('clientOS') or 'Unknown OS'
+        clientBrowser = req.get('clientBrowser', 'Unknown browser')
+        clientOS = req.get('clientOS', 'Unknown OS')
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
@@ -118,8 +118,8 @@ def userAuthOrRegisterByCode():
     try:
         req = request.json
         secretCode = req['code']
-        clientBrowser = req.get('clientBrowser') or 'Unknown browser'
-        clientOS = req.get('clientOS') or 'Unknown OS'
+        clientBrowser = req.get('clientBrowser', 'Unknown browser')
+        clientOS = req.get('clientOS', 'Unknown OS')
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
@@ -343,6 +343,7 @@ def usersGetAll():
     try:
         req = request.args
         search = req.get('search')
+        order = req.get('order')
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 

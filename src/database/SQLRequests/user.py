@@ -64,7 +64,7 @@ def selectUsersByFilters(filters):
             "WHERE " + \
             (f"LOWER(familyName || ' ' || givenName ' ' || middleName) LIKE '%%{filters['search'].lower()}%%' AND " if 'search' in filters else "") + \
             "1 = 1 " \
-            "ORDER BY familyName, givenName"
+            "ORDER BY " + f"{', '.join(filters.get('order', []) + ['id'])}"
 
 selectSecretCodeByUserIdType = \
     "SELECT * FROM secretCodes " \

@@ -21,6 +21,7 @@ def eventsGet(userData):
         search = req.get('search')
         registrationId = req.get('registrationId')
         type = req.get('type')
+        order = req.get('order')
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
@@ -42,7 +43,7 @@ def eventsGet(userData):
     list_times_to_str(events)
     for event in events:
         countRes = DB.execute(SQLEvents.selectRegistrationsCountByEventid, [event['id']])
-        event['registrationscount'] = countRes.get('count') or 0
+        event['registrationscount'] = countRes.get('count', 0)
         res = DB.execute(SQLEvents.selectRegistrationByUseridEventid, [userData['id'], event['id']])
         event['isyouregistered'] = bool(res)
         event['isyourregistrationconfirmed'] = res['isconfirmed'] if res else None

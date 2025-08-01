@@ -18,6 +18,7 @@ def docsGet(userId):
         id = req.get('id')
 
         search = req.get('search')
+        order = req.get('order')
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 

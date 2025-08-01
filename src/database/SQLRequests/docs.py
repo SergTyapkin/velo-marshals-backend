@@ -13,7 +13,7 @@ def selectDocs(filters):
             "WHERE " + \
             (f"LOWER(title) LIKE '%%{filters['search'].lower()}%%' AND " if 'search' in filters else "") + \
             "1 = 1 " \
-            "ORDER BY title"
+            "ORDER BY " + f"{', '.join(filters.get('order', []) + ['id'])}"
 
 selectDocById = \
     "SELECT docs.*, (users.givenName  || ' ' || users.familyName) as authorname, users.tgusername authortelegram, (ured.givenName  || ' ' || ured.familyName) lastredactorname, ured.tgusername lastredactortelegram FROM docs " \
