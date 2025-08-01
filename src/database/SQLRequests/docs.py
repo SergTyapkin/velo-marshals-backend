@@ -1,3 +1,5 @@
+import json
+
 insertDoc = \
     "INSERT INTO docs (title, text, authorId, lastRedactorId) " \
     "VALUES (%s, %s, %s, %s) " \
@@ -6,14 +8,17 @@ insertDoc = \
 # ------------------
 
 def selectDocs(filters):
+    order = json.loads(filters.get('order')) if filters.get('order') else []
+    search = filters.get('search', '').lower()
+
     return \
             f"SELECT docs.*, (users.givenName  || ' ' || users.familyName) as authorname, users.tgusername authortelegram, (ured.givenName  || ' ' || ured.familyName) lastredactorname, ured.tgusername lastredactortelegram FROM docs " \
             "LEFT JOIN users ON docs.authorId = users.id " + \
             "LEFT JOIN users ured ON docs.lastRedactorId = ured.id " + \
             "WHERE " + \
-            (f"LOWER(title) LIKE '%%{filters['search'].lower()}%%' AND " if 'search' in filters else "") + \
+            (f"LOWER(title) LIKE '%%{search}%%' AND " if 'search' in filters else "") + \
             "1 = 1 " \
-            "ORDER BY " + f"{', '.join(filters.get('order', []) + ['id'])}"
+            "ORDER BY " + f"{', '.join(order + ['id'])}"
 
 selectDocById = \
     "SELECT docs.*, (users.givenName  || ' ' || users.familyName) as authorname, users.tgusername authortelegram, (ured.givenName  || ' ' || ured.familyName) lastredactorname, ured.tgusername lastredactortelegram FROM docs " \

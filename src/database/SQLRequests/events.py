@@ -1,3 +1,5 @@
+import json
+
 insertEvent = \
     "INSERT INTO events (title, description, fullDescription, routeDescription, previewUrl, customCSS, lapDistanceKm, medalPreviewUrl, authorId, startDate, cameDate) " \
     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) " \
@@ -15,6 +17,7 @@ def selectEvents(filters):
     dateStart = filters.get('dateStart')
     dateEnd = filters.get('dateEnd')
     search = filters.get('search')
+    order = json.loads(filters.get('order')) if filters.get('order') else []
 
     typeStr = "1 = 1 "
     if type == 'future':
@@ -37,7 +40,7 @@ def selectEvents(filters):
             (f"startDate < '{dateEnd}' AND " if dateEnd is not None else "") + \
             (f"LOWER(events.title) LIKE '%%{search.lower()}%%' AND " if search is not None else "") + \
             registrationWhere + typeStr + \
-            "ORDER BY " + f"{', '.join(filters.get('order', []) + ['id'])}"
+            "ORDER BY " + f"{', '.join(order + ['id'])}"
 
 selectEventById = \
     "SELECT events.*, (users.givenName  || ' ' || users.familyName) as authorname, users.tgusername authortelegram, (events.startDate >= NOW()) isinfuture FROM events " \

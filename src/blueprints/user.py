@@ -204,9 +204,8 @@ def userGet(userData):
 
     def addGlobals(userData):
         globalEvent = DB.execute(SQLGlobals.selectGlobalEvent) or {}
-        userData['globalEventId'] = globalEvent.get('id')
-        userData['globalIsOnMaintenance'] = globalEvent.get('isonmaintenance')
-        userData['globalEvent'] = globalEvent
+        userData['isonmaintenance'] = globalEvent.get('isonmaintenance')
+        userData['globalevent'] = globalEvent
 
     if tgUsername is not None or tgId is not None:  # return user data by tgUsername or tgId
         user = DB.execute(SQLUser.selectUserIdByTgUsernameOrTgId, [tgUsername, str(tgId)])

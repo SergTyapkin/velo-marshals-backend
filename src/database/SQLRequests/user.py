@@ -1,6 +1,8 @@
 # -----------------------
 # -- Default user part --
 # -----------------------
+import json
+
 _userPublicColumns = "users.id, users.tgUsername, users.tgId, users.tel, users.avatarUrl, users.givenName, users.familyName, users.middleName, users.joinedDate, users.level"
 
 # ----- INSERTS -----
@@ -59,12 +61,15 @@ selectUserDataBySessionToken = \
     "WHERE token = %s"
 
 def selectUsersByFilters(filters):
+    search = filters.get('search', '').lower()
+    order = json.loads(filters.get('order')) if filters.get('order') else []
+
     return \
             f"SELECT {_userPublicColumns} FROM users " \
             "WHERE " + \
-            (f"LOWER(familyName || ' ' || givenName ' ' || middleName) LIKE '%%{filters['search'].lower()}%%' AND " if 'search' in filters else "") + \
+            (f"LOWER(familyName || ' ' || givenName ' ' || middleName || ' ' || id) LIKE '%%{search}%%' AND " if 'search' in filters else "") + \
             "1 = 1 " \
-            "ORDER BY " + f"{', '.join(filters.get('order', []) + ['id'])}"
+            "ORDER BY " + f"{', '.join(order + ['id'])}"
 
 selectSecretCodeByUserIdType = \
     "SELECT * FROM secretCodes " \
