@@ -91,7 +91,8 @@ selectRegistrationsByUserId = \
 
 selectRegistrationsCountByEventid = \
     "SELECT COUNT(*) count FROM registrations " \
-    "WHERE eventid = %s"
+    "WHERE eventid = %s " \
+    "AND isConfirmed != FALSE"
 
 def selectRatings(dateStart=None, dateEnd=None):
     return \

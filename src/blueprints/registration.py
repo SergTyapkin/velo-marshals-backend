@@ -10,31 +10,20 @@ from src.database.SQLRequests import events as SQLEvents
 app = Blueprint('registrations', __name__)
 
 
-@app.route("/event/unconfirmed", methods=["GET"])
-@login_and_can_edit_registrations_required
-def getUnvotedRegistrations(userData):
-    try:
-        req = request.json
-        eventId = req['eventId']
-    except Exception as err:
-        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
-
-    resp = DB.execute(SQLEvents.selectRegistrationsUnconfirmedByEventid, [eventId], manyResults=True)
-    list_times_to_str(resp)
-    return jsonResponse({'registrations': resp})
-
-
 @app.route("/event", methods=["GET"])
 @login_and_can_edit_registrations_required
 def getRegistrationsByEvent(userData):
     try:
         req = request.args
         eventId = req['eventId']
-        isConfirmed = bool(req.get('isConfirmed'))
+        isConfirmed = req.get('isConfirmed')
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
-    resp = DB.execute(SQLEvents.selectRegistrationsByEventidIsConfirmed, [eventId, isConfirmed], manyResults=True)
+    if isConfirmed is not None:
+        resp = DB.execute(SQLEvents.selectRegistrationsByEventidIsConfirmed, [eventId, isConfirmed], manyResults=True)
+    else:
+        resp = DB.execute(SQLEvents.selectRegistrationsByEventid, [eventId], manyResults=True)
     if resp is None:
         return jsonResponse("Событие не найдено", HTTP_NOT_FOUND)
 

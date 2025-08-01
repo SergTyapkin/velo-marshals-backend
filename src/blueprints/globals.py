@@ -26,7 +26,7 @@ def globalsUpdate(userData):
 
     if inEventId is None:
         inEventId = globalsData['ineventid']
-    elif inEventId < 0:
+    elif int(inEventId) < 0:
         inEventId = None
     isOnMaintenance = isOnMaintenance if isOnMaintenance is not None else globalsData['isonmaintenance']
 

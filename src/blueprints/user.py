@@ -201,9 +201,10 @@ def userGet(userData):
         userData['completedevents'] = completedEvents
 
     def addGlobals(userData):
+        globals = DB.execute(SQLGlobals.selectGlobals)
         globalEvent = DB.execute(SQLGlobals.selectGlobalEvent)
         globalRegistration = DB.execute(SQLGlobals.selectGlobalRegistrationByUserId, [userData['id']])
-        userData['isonmaintenance'] = bool(globalEvent.get('isonmaintenance'))
+        userData['isonmaintenance'] = globals['isonmaintenance']
         userData['globalevent'] = None if not globalEvent else globalEvent
         userData['globalregistration'] = None if not globalRegistration else globalRegistration
 
