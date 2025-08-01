@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS users (
     canEditUsersData        BOOLEAN DEFAULT FALSE,
     canEditDocs             BOOLEAN DEFAULT FALSE,
     canExecuteSQL           BOOLEAN DEFAULT FALSE,
-    canEditHistory          BOOLEAN DEFAULT FALSE
+    canEditHistory          BOOLEAN DEFAULT FALSE,
+    canEditGlobals          BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
@@ -145,4 +146,10 @@ CREATE TABLE IF NOT EXISTS history (
     type           TEXT NOT NULL,
     text           TEXT NOT NULL,
     date           TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+------ Globals ------
+CREATE TABLE IF NOT EXISTS globals (
+    inEventId       INT REFERENCES events(id) ON DELETE SET NULL ON UPDATE CASCADE DEFAULT NULL,
+    isOnMaintenance BOOLEAN NOT NULL DEFAULT FALSE
 );

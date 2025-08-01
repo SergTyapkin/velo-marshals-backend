@@ -114,6 +114,12 @@ def login_and_can_edit_history_required(f):
         (userData, res) = __login_and_property_required('canedithistory', "Нет прав на изменение и просмотр истории")
         return res or f(*args, userData, **kwargs)
     return wrapper
+def login_and_can_edit_globals_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        (userData, res) = __login_and_property_required('caneditglobals', "Нет прав на изменение и просмотр истории")
+        return res or f(*args, userData, **kwargs)
+    return wrapper
 
 def login_required_return_id(f):
     @wraps(f)

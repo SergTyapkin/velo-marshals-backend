@@ -15,10 +15,14 @@ from src.blueprints.registration import app as registration_app
 from src.blueprints.docs import app as docs_app
 from src.blueprints.image import app as image_app
 from src.blueprints.achievements import app as achievements_app
-from src.connections import config
+from src.blueprints.globals import app as globals_app
+from src.connections import config, DB
 from src.constants import HTTP_NOT_FOUND, HTTP_INTERNAL_ERROR, MAX_LOG_DATA_LENGTH
 from src.middleware import Middleware
 from src.utils.utils import jsonResponse
+
+from src.database.SQLRequests import globals as SQLGlobals
+
 
 app = Flask(__name__)
 app.config['DEBUG'] = config['debug']
@@ -31,6 +35,7 @@ app.register_blueprint(registration_app, url_prefix='/registration')
 app.register_blueprint(docs_app,   url_prefix='/docs')
 app.register_blueprint(image_app,   url_prefix='/image')
 app.register_blueprint(achievements_app,   url_prefix='/achievements')
+app.register_blueprint(globals_app,   url_prefix='/globals')
 
 app.config['MAIL_SERVER'] = config['SMTP_mail_server_host']
 app.config['MAIL_PORT'] = config['SMTP_mail_server_port']
@@ -117,6 +122,10 @@ def log_request(response):
 
     return response
 
+
 if __name__ == '__main__':
+    # Create global settings if it doesn't exist now
+    if not DB.execute(SQLGlobals.selectGlobals):
+        DB.execute(SQLGlobals.insertGlobals)
     port = int(os.environ.get('PORT', config['port']))
     app.run(port=port, debug=bool(config['debug']))

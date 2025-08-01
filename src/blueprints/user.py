@@ -13,6 +13,7 @@ from src.database.databaseUtils import insertHistory, createSecretCode
 
 from src.database.SQLRequests import user as SQLUser
 from src.database.SQLRequests import events as SQLEvents
+from src.database.SQLRequests import globals as SQLGlobals
 
 from src import email_templates as emails
 
@@ -197,26 +198,29 @@ def userGet(userData):
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     def addEvents(userData):
-        allEvents = DB.execute(SQLEvents.selectEvents({"registrationId": userData['id']}), manyResults=True)
-        list_times_to_str(allEvents)
-        resEvents = []
-        for event in allEvents:
-            resEvents.append({
-                "id": event["id"],
-                "title": event["title"],
-            })
-        userData['completedevents'] = resEvents
+        completedEvents = DB.execute(SQLEvents.selectEvents({"userId": userData['id']}), manyResults=True)
+        list_times_to_str(completedEvents)
+        userData['completedevents'] = completedEvents
+
+    def addGlobals(userData):
+        globalEvent = DB.execute(SQLGlobals.selectGlobalEvent) or {}
+        userData['globalEventId'] = globalEvent.get('id')
+        userData['globalIsOnMaintenance'] = globalEvent.get('isonmaintenance')
+        userData['globalEvent'] = globalEvent
 
     if tgUsername is not None or tgId is not None:  # return user data by tgUsername or tgId
         user = DB.execute(SQLUser.selectUserIdByTgUsernameOrTgId, [tgUsername, str(tgId)])
         if not user:
             return jsonResponse("Пользователя с таким tgUsername или tgId не существует", HTTP_NOT_FOUND)
+        addEvents(user)
+        addGlobals(user)
         return jsonResponse(user)
 
     if userId is None:  # return self user data
         if userData is None:
             return jsonResponse("Не авторизован", HTTP_INVALID_AUTH_DATA)
         addEvents(userData)
+        addGlobals(userData)
         return jsonResponse(userData)
 
     # get another user data
@@ -226,6 +230,7 @@ def userGet(userData):
         anotherUserData = DB.execute(SQLUser.selectAnotherUserById, [userId])
     if not anotherUserData:
         return jsonResponse("Пользователь не найден", HTTP_NOT_FOUND)
+    addEvents(anotherUserData)
     addEvents(anotherUserData)
     return jsonResponse(anotherUserData)
 
