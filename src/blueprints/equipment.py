@@ -9,7 +9,19 @@ from src.database.SQLRequests import equipment as SQLEquipment
 app = Blueprint('equipment', __name__)
 
 
-@app.route("")
+@app.route("/event/groups")
+@login_required_return_id
+def equipmentGroupsGet(userId):
+    try:
+        req = request.args
+        eventId = req['eventId']
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
+
+    equipment = DB.execute(SQLEquipment.selectEquipmentsGroupsByEventId, [eventId], manyResults=True)
+    return jsonResponse({"equipmentGroups": equipment})
+
+@app.route("/event")
 @login_required_return_id
 def equipmentGet(userId):
     try:
@@ -22,7 +34,7 @@ def equipmentGet(userId):
     return jsonResponse({"equipment": equipment})
 
 
-@app.route("", methods=["POST"])
+@app.route("/event", methods=["POST"])
 @login_and_can_edit_events_required
 def equipmentCreate(userData):
     try:
@@ -104,11 +116,11 @@ def equipmentDelete(userData):
     return jsonResponse("Оборудование удалено")
 
 
-@app.route("/holders", methods=["GET"])
+@app.route("/event/holders", methods=["GET"])
 @login_required
-def equipmentDelete(userData):
+def equipmentHoldersGet(userData):
     try:
-        req = request.json
+        req = request.args
         eventId = req['eventId']
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
@@ -118,26 +130,26 @@ def equipmentDelete(userData):
     return jsonResponse({"holders": equipment})
 
 
-@app.route("/holder", methods=["GET"])
-@login_and_can_edit_events_required
-def equipmentDelete(userData):
+@app.route("/event/holder", methods=["GET"])
+@login_required
+def equipmentHoldersDelete(userData):
     try:
-        req = request.json
+        req = request.args
         userId = req['userId']
         eventId = req['eventId']
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
-    equipment = DB.execute(SQLEquipment.selectUserEquipmentsByUseridEventId, [userId, eventId])
+    equipment = DB.execute(SQLEquipment.selectUserEquipmentsByUseridEquipmentId, [userId, eventId], manyResults=True)
 
-    return jsonResponse(equipment)
+    return jsonResponse({"equipment": equipment})
 
 
-@app.route("/holders/history", methods=["GET"])
+@app.route("/event/holders/history", methods=["GET"])
 @login_and_can_edit_events_required
-def equipmentDelete(userData):
+def equipmentHoldersHistoryGet(userData):
     try:
-        req = request.json
+        req = request.args
         eventId = req['eventId']
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
@@ -147,66 +159,62 @@ def equipmentDelete(userData):
     return jsonResponse({"history": history})
 
 
-@app.route("/holder", methods=["POST"])
+@app.route("/holder/add", methods=["PUT"])
 @login_required
-def equipmentDelete(userData):
+def addEquipmentToUser(userData):
     try:
         req = request.json
         userId = req['userId']
         equipmentId = req['equipmentId']
-        amountHolds = req['amountHolds']
+        amountAdd = int(req['amountAdd'])
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
-    if userId != userData['userId'] and not userData['caneditevents']:
+    if userId != userData['id'] and not userData['caneditevents']:
         return jsonResponse("Нет прав доступа на запись оборудования на другого пользователя", HTTP_NOT_FOUND)
-    equipment = DB.execute(SQLEquipment.insertUserEquipment, [userId, equipmentId, amountHolds])
+    equipment = DB.execute(SQLEquipment.selectUserEquipmentsByUseridEquipmentId, [userId, equipmentId])
+    if not equipment:
+        equipment = DB.execute(SQLEquipment.insertUserEquipment, [userId, equipmentId, amountAdd])
+    else:
+        equipment = DB.execute(SQLEquipment.updateUserEquipmentAmountHoldsByUseridEquipmentId, [equipment['amountholds'] + amountAdd, userId, equipmentId])
 
     insertHistory(
         userId,
         'equipment',
-        f'Sets equipment on user by #{userData["id"]}, equipment: #{equipment["id"]}, amount: {amountHolds}'
+        f'Adds equipment on user by #{userData["id"]}, equipment: #{equipment["id"]}, amount: {amountAdd}'
     )
 
     return jsonResponse(equipment)
 
 
-@app.route("/holder", methods=["PUT"])
-@login_and_can_edit_events_required
-def equipmentDelete(userData):
+@app.route("/holder/remove", methods=["PUT"])
+@login_required
+def removeEquipmentFromUser(userData):
     try:
         req = request.json
-        id = req['id']
-        amount = req['amount']
+        userId = req['userId']
+        equipmentId = req['equipmentId']
+        amountRemove = int(req['amountRemove'])
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
-    equipment = DB.execute(SQLEquipment.updateUserEquipmentAmountHoldsById, [amount, id])
+    if userId != userData['id'] and not userData['caneditevents']:
+        return jsonResponse("Нет прав доступа на запись оборудования на другого пользователя", HTTP_NOT_FOUND)
+
+    equipment = DB.execute(SQLEquipment.selectUserEquipmentsByUseridEquipmentId, [userId, equipmentId])
+    if not equipment:
+        return jsonResponse("Пользователь не брал это оборудование", HTTP_DATA_CONFLICT)
+    if amountRemove > equipment['amountholds']:
+        return jsonResponse("Нельзя списать с пользователя больше оборудования, чем у него есть", HTTP_DATA_CONFLICT)
+    if amountRemove == equipment['amountholds']:
+        equipment = DB.execute(SQLEquipment.deleteUserEquipmentByUseridEquipmentId, [userId, equipmentId])
+    else:
+        equipment = DB.execute(SQLEquipment.updateUserEquipmentAmountHoldsByUseridEquipmentId, [equipment['amountholds'] - amountRemove, userId, equipmentId])
 
     insertHistory(
-        equipment['userid'],
+        userId,
         'equipment',
-        f'Sets equipment amount by #{userData["id"]}: "{equipment["title"]}", #{equipment["id"]}, amount: {amount}'
+        f'Remove equipment from user by #{userData["id"]}, equipment: #{equipment["id"]}, amount: {amountRemove}'
     )
 
     return jsonResponse(equipment)
-
-
-@app.route("/holder", methods=["DELETE"])
-@login_and_can_edit_events_required
-def equipmentDelete(userData):
-    try:
-        req = request.json
-        id = req['id']
-    except Exception as err:
-        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
-
-    DB.execute(SQLEquipment.deleteUserEquipmentById, [id])
-
-    insertHistory(
-        userData["id"],
-        'equipment',
-        f'Deleted equipment on user: #{id}'
-    )
-
-    return jsonResponse("Оборудование списано с пользователя")

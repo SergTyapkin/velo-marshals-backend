@@ -17,6 +17,7 @@ def selectEvents(filters):
     dateStart = filters.get('dateStart')
     dateEnd = filters.get('dateEnd')
     search = filters.get('search')
+    isCompleted = filters.get('isCompleted')
     order = json.loads(filters.get('order')) if filters.get('order') else []
 
     typeStr = "1 = 1 "
@@ -31,6 +32,11 @@ def selectEvents(filters):
         registrationJoin = "JOIN registrations r ON r.eventId = events.id "
         registrationWhere = f"r.userId = {filters['userId']} AND "
 
+    completedWhere = ""
+    if isCompleted:
+        completedWhere = f"r.leaveDate IS NOT NULL AND "
+
+
     return \
             f"SELECT events.*, (users.givenName  || ' ' || users.familyName) as authorname, (events.startDate >= NOW()) isinfuture FROM events " \
             "LEFT JOIN users ON events.authorId = users.id " + \
@@ -39,7 +45,7 @@ def selectEvents(filters):
             (f"startDate >= '{dateStart}' AND " if dateStart is not None else "") + \
             (f"startDate < '{dateEnd}' AND " if dateEnd is not None else "") + \
             (f"LOWER(events.title) LIKE '%%{search.lower()}%%' AND " if search is not None else "") + \
-            registrationWhere + typeStr + \
+            registrationWhere + completedWhere + typeStr + \
             "ORDER BY " + f"{', '.join(order + ['id'])}"
 
 selectEventById = \

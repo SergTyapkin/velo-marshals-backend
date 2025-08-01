@@ -198,14 +198,16 @@ def userGet(userData):
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
     def addEvents(userData):
-        completedEvents = DB.execute(SQLEvents.selectEvents({"userId": userData['id']}), manyResults=True)
+        completedEvents = DB.execute(SQLEvents.selectEvents({"userId": userData['id'], "isCompleted": True}), manyResults=True)
         list_times_to_str(completedEvents)
         userData['completedevents'] = completedEvents
 
     def addGlobals(userData):
         globalEvent = DB.execute(SQLGlobals.selectGlobalEvent) or {}
+        globalRegistration = DB.execute(SQLGlobals.selectGlobalRegistrationByUserId, [userData['id']]) or {}
         userData['isonmaintenance'] = globalEvent.get('isonmaintenance')
         userData['globalevent'] = globalEvent
+        userData['globalregistration'] = globalRegistration
 
     if tgUsername is not None or tgId is not None:  # return user data by tgUsername or tgId
         user = DB.execute(SQLUser.selectUserIdByTgUsernameOrTgId, [tgUsername, str(tgId)])

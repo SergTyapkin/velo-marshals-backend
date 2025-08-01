@@ -39,6 +39,22 @@ def getRegistrationsByEvent(userData):
 
     return jsonResponse({'registrations': resp})
 
+@app.route("/event/user", methods=["GET"])
+@login_and_can_edit_registrations_required
+def getRegistrationsByEventUser(userData):
+    try:
+        req = request.args
+        eventId = req['eventId']
+        userId = req['userId']
+    except Exception as err:
+        return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
+
+    resp = DB.execute(SQLEvents.selectRegistrationByUseridEventid, [userId, eventId])
+    if resp is None:
+        return jsonResponse("Регистрация не найдена", HTTP_NOT_FOUND)
+
+    return jsonResponse(resp)
+
 
 @app.route("/event", methods=["POST"])
 @login_required
