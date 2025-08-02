@@ -255,13 +255,17 @@ def removeEquipmentFromUser(userData):
         return jsonResponse("Нельзя списать с пользователя больше оборудования, чем у него есть", HTTP_DATA_CONFLICT)
     if amountRemove == equipment['amountholds']:
         equipment = DB.execute(SQLEquipment.deleteUserEquipmentByUseridEquipmentId, [userId, equipmentId])
+        insertHistory(
+            userId,
+            'equipment',
+            f'Remove equipment from user by #{userData["id"]}, equipment: #{equipmentId}, amount: {amountRemove}. equipmentUser row deleted'
+        )
     else:
         equipment = DB.execute(SQLEquipment.updateUserEquipmentAmountHoldsByUseridEquipmentId, [equipment['amountholds'] - amountRemove, userId, equipmentId])
-
-    insertHistory(
-        userId,
-        'equipment',
-        f'Remove equipment from user by #{userData["id"]}, equipment: #{equipment["id"]}, amount: {amountRemove}'
-    )
+        insertHistory(
+            userId,
+            'equipment',
+            f'Remove equipment from user by #{userData["id"]}, equipment: #{equipmentId} {equipment["title"]}, amount: {amountRemove}'
+        )
 
     return jsonResponse(equipment)
