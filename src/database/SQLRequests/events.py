@@ -17,6 +17,7 @@ def selectEvents(filters):
     dateStart = filters.get('dateStart')
     dateEnd = filters.get('dateEnd')
     search = filters.get('search')
+    userId = filters.get('userId')
     isCompleted = filters.get('isCompleted')
     order = json.loads(filters.get('order')) if filters.get('order') else []
 
@@ -28,13 +29,12 @@ def selectEvents(filters):
 
     registrationJoin = ""
     registrationWhere = ""
-    if 'userId' in filters:
-        registrationJoin = "JOIN registrations r ON r.eventId = events.id "
-        registrationWhere = f"r.userId = {filters['userId']} AND "
-
     completedWhere = ""
-    if isCompleted:
-        completedWhere = f"r.leaveDate IS NOT NULL AND "
+    if userId is not None:
+        registrationJoin = "JOIN registrations r ON r.eventId = events.id "
+        registrationWhere = f"r.userId = {userId} AND "
+        if isCompleted:
+            completedWhere = f"r.leaveDate IS NOT NULL AND "
 
 
     return \
