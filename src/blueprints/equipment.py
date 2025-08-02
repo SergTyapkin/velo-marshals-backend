@@ -180,7 +180,7 @@ def equipmentHoldersDelete(userData):
     except Exception as err:
         return jsonResponse(f"Не удалось сериализовать json: {err.__repr__()}", HTTP_INVALID_DATA)
 
-    equipment = DB.execute(SQLEquipment.selectUserEquipmentsByUseridEquipmentId, [userId, eventId], manyResults=True)
+    equipment = DB.execute(SQLEquipment.selectUserEquipmentsByUserIdEventId, [userId, eventId], manyResults=True)
 
     return jsonResponse({"equipment": equipment})
 

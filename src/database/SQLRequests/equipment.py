@@ -34,12 +34,6 @@ selectEquipmentWithAmountLeftById = \
     "WHERE equipment.id = %s " \
     "GROUP BY equipment.id"
 
-selectEquipmentUsersHoldersByEquipmentIdEventId = \
-    "SELECT users.id, (users.givenName  || ' ' || users.familyName) as username, users.avatarUrl FROM usersEquipments " \
-    "LEFT JOIN users ON usersEquipments.userId = users.id " \
-    "WHERE usersEquipments.equipmentId = %s " \
-    "AND eventId = %s"
-
 selectUserEquipmentsByUseridEquipmentId = \
     "SELECT usersequipments.*, equipment.title, equipment.previewUrl, equipment.isNeedsToReturn  FROM usersequipments " \
     "JOIN equipment on usersequipments.equipmentid = equipment.id " \
@@ -47,6 +41,15 @@ selectUserEquipmentsByUseridEquipmentId = \
     "AND equipmentid = %s " \
     "ORDER BY takenDate"
 
+selectUserEquipmentsByUserIdEventId = \
+    "SELECT usersequipments.*, equipment.title, equipment.previewUrl, equipment.isNeedsToReturn  FROM usersequipments " \
+    "JOIN equipment on usersequipments.equipmentid = equipment.id " \
+    "WHERE userid = %s " \
+    "AND eventid = %s " \
+    "ORDER BY takenDate"
+
+
+# ----- UPDATES ------
 
 updateEquipmentById = \
     "UPDATE equipment " \
