@@ -1,6 +1,8 @@
 ![GithubCI](https://github.com/SergTyapkin/velo-marshals-backend/actions/workflows/deployMain.yml/badge.svg)
 
-# ARK Backend
+# Velo Marshals Backend
+Бэкенд для сайта веломаршалов московских велофестивалей
+[Репозиторий фронтенда с картинками](https://github.com/SergTyapkin/velo-marshals-frontend)
 
 Используемые технологии:
 
