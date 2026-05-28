@@ -37,7 +37,7 @@ class TgBotClass:
             markupWithLinkButton = telebot.types.InlineKeyboardMarkup()
             btn1 = telebot.types.InlineKeyboardButton(
                 text='Перейти на сайт',
-                url=f'{config['frontend_scheme']}://{config['frontend_host']}'
+                url=f"""{config['frontend_scheme']}://{config['frontend_host']}"""
             )
             markupWithLinkButton.add(btn1)
 
@@ -74,7 +74,7 @@ class TgBotClass:
                     markup = telebot.types.InlineKeyboardMarkup()
                     btnEnter = telebot.types.InlineKeyboardButton(
                         text='Войти на сайте',
-                        url=f'{config['frontend_scheme']}://{config['frontend_host']}/login?code={secretCode}'
+                        url=f"""{config['frontend_scheme']}://{config['frontend_host']}/login?code={secretCode}"""
                     )
                     markup.add(btnEnter)
                     self.bot.send_message(
