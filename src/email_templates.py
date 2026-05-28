@@ -1,3 +1,5 @@
+from src.connections import config
+
 def _default_template(avatarUrl, fullName, htmlContent):
     avatarDiv = '<br>'
     if avatarUrl:
@@ -26,7 +28,7 @@ def _default_template(avatarUrl, fullName, htmlContent):
                 
           <br>
           <div style="padding: 0;color: #aaa;font-size: 11px;text-align: left;">
-            <span>Вы видите это письмо, потому что этот этот адрес указан при регистрации на marshals.ssu-it-dep.bmstu.ru.</span>
+            <span>Вы видите это письмо, потому что этот этот адрес указан при регистрации на {config['frontend_host']}.</span>
             <br>
             <span>С этого электронного адреса будут приходить только важные письма для восстановления пароля, входа в аккаунт и.т.п.</span>
           </div>
@@ -34,7 +36,7 @@ def _default_template(avatarUrl, fullName, htmlContent):
     
         <div style="padding: 20px 30px;color: #666;overflow: auto;background-color: #00000055;border-radius: 7px">
           <span style="float: left">
-            <a href="https://marshals.ssu-it-dep.bmstu.ru target="_blank" style="font-size: 13px;font-weight: bold;color: #e7e7e7 !important;" rel=" noopener noreferrer">marshals.ssu-it-dep.bmstu.ru</a>
+            <a href="{config['frontend_scheme']}://{config['frontend_host']}" target="_blank" style="font-size: 13px;font-weight: bold;color: #e7e7e7 !important;" rel=" noopener noreferrer">{config['frontend_host']}</a>
             <br>
             <span style="color: #b9b9b9;font-size: 12px;">Сергей Тяпкин</span>
           </span>
@@ -48,7 +50,7 @@ def restorePassword(avatarUrl, fullName, code):
     return _default_template(avatarUrl, fullName, f"""
     <span style="color: #d5d5d5">Ваша ссылка для восстановления пароля:</span>
     <br>
-    <a href="https://marshals.ssu-it-dep.bmstu.ru/password/restore?code={code}" target="_blank" style="margin-top:10px;line-height: 1;box-sizing: border-box;display: inline-block;max-width: 100%;padding: 10px 15px;border-radius: 5555px;background: #444;border: #1a795f solid 1px;box-shadow: 5px 5px 10px rgb(0 0 0 / 27%);font-weight: bold;color: #b1e5df !important;" rel=" noopener noreferrer"><span style="display: inline-block;width: 14px;height: 18px;vertical-align: middle;"></span> Восстановить пароль</a>
+    <a href="{config['frontend_scheme']}://{config['frontend_host']}/password/restore?code={code}" target="_blank" style="margin-top:10px;line-height: 1;box-sizing: border-box;display: inline-block;max-width: 100%;padding: 10px 15px;border-radius: 5555px;background: #444;border: #1a795f solid 1px;box-shadow: 5px 5px 10px rgb(0 0 0 / 27%);font-weight: bold;color: #b1e5df !important;" rel=" noopener noreferrer"><span style="display: inline-block;width: 14px;height: 18px;vertical-align: middle;"></span> Восстановить пароль</a>
     <br>
     <span style="color: #d5d5d5">Ссылка одноразовая и действительна ровно час</span>    
     """)
@@ -57,7 +59,7 @@ def restorePassword(avatarUrl, fullName, code):
 def loginByCode(avatarUrl, fullName, code):
     return _default_template(avatarUrl, fullName, f"""
     <span style="color: #d5d5d5">Ваша ссылка для входа:</span>
-    <a href="https://marshals.ssu-it-dep.bmstu.ru/login?code={code}" target="_blank" style="margin-top:10px;line-height: 1;box-sizing: border-box;display: inline-block;max-width: 100%;padding: 10px 15px;border-radius: 5555px;background: #444;border: #1a795f solid 1px;box-shadow: 5px 5px 10px rgb(0 0 0 / 27%);font-weight: bold;color: #b1e5df !important;" rel=" noopener noreferrer"><span style="display: inline-block;width: 14px;height: 18px;vertical-align: middle;"></span> Подтвердить регистрацию</a>
+    <a href="{config['frontend_scheme']}://{config['frontend_host']}/login?code={code}" target="_blank" style="margin-top:10px;line-height: 1;box-sizing: border-box;display: inline-block;max-width: 100%;padding: 10px 15px;border-radius: 5555px;background: #444;border: #1a795f solid 1px;box-shadow: 5px 5px 10px rgb(0 0 0 / 27%);font-weight: bold;color: #b1e5df !important;" rel=" noopener noreferrer"><span style="display: inline-block;width: 14px;height: 18px;vertical-align: middle;"></span> Подтвердить регистрацию</a>
     <br>
     <br>
     <span>Ссылка для подтверждения одноразовая и действительна ровно час</span>  
@@ -70,7 +72,7 @@ def confirmEmail(avatarUrl, fullName, code):
     <br>
     <br>
     <hr>
-    <a href="https://marshals.ssu-it-dep.bmstu.ru/email/confirm?code={code}" target="_blank" style="margin-top:10px;line-height: 1;box-sizing: border-box;display: inline-block;max-width: 100%;padding: 10px 15px;border-radius: 5555px;background: #444;border: #ff9b2a solid 1px;box-shadow: 5px 5px 10px rgb(0 0 0 / 27%);font-weight: bold;color: #ff9b2a !important;" rel=" noopener noreferrer"><span style="display: inline-block;width: 14px;height: 18px;vertical-align: middle;"></span> Подтвердить регистрацию</a>
+    <a href="{config['frontend_scheme']}://{config['frontend_host']}/email/confirm?code={code}" target="_blank" style="margin-top:10px;line-height: 1;box-sizing: border-box;display: inline-block;max-width: 100%;padding: 10px 15px;border-radius: 5555px;background: #444;border: #ff9b2a solid 1px;box-shadow: 5px 5px 10px rgb(0 0 0 / 27%);font-weight: bold;color: #ff9b2a !important;" rel=" noopener noreferrer"><span style="display: inline-block;width: 14px;height: 18px;vertical-align: middle;"></span> Подтвердить регистрацию</a>
     <br>
     <br>
     <span>Ссылка для подтверждения одноразовая и действительна ровно день</span>    
