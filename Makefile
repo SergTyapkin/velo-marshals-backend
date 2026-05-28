@@ -21,6 +21,10 @@ logs:
     bash ./docker-deploy/scripts/logs.sh
 
 
+download-geolite-db:
+	@echo "[Make]: Running 'download-geolite-db:' target in Makefile..." && \
+    wget -O ./configs/GeoLite2-City.mmdb https://git.io/GeoLite2-City.mmdb
+
 update:
 	@echo "[Make]: Running 'update' target in Makefile..." && \
     bash ./docker-deploy/scripts/update-deploy.sh
@@ -53,6 +57,7 @@ backup:
 all:
 	@echo "[Make]: Running 'all' target in Makefile..." && \
 	make setup-env-file
+	make download-geolite-db
 	make make-dirs
 	make setup-ci
 	make update
