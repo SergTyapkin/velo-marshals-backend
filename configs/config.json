@@ -16,7 +16,7 @@
 
     "port": 9000,
     "debug": true,
-    "save_images_to_db": false,
+    "save_images_to_db": true,
     "save_images_folder": "./images",
     "frontend_host": "marshals.serg-t.ru",
     "frontend_scheme": "https",

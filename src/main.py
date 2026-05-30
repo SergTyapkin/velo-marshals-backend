@@ -92,7 +92,10 @@ def log_request(response):
     except:
         pass
 
-    responseText = response.get_data().decode()
+    try:
+        responseText = response.get_data().decode()
+    except UnicodeDecodeError:
+        responseText = "[BINARY DATA]"
 
     log_params = [
         (timestamp, purple),
